@@ -23,7 +23,7 @@ var TEAM_NAMES_ = [
 var DIFFICULTY_MULT_ = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
 var RESULTS_ = ['승', '무', '패'];
 var NICK_MAX_ = 12;
-// 경기 시간(분) 화이트리스트와 현실적인 득점 상한 (한 팀 기준, 분당 최대 GOALS_PER_MIN_ 골)
+// 경기 시간(분) 화이트리스트와 현실적인 득점 상한 (내 팀 득점은 분당 최대 GOALS_PER_MIN_ 골, 실점은 GOALS_MAX_ 까지)
 var MINUTES_ = [2, 4, 6];
 var GOALS_PER_MIN_ = 4;
 var GOALS_MAX_ = 24;
@@ -172,9 +172,11 @@ function sanitizeRecord_(r) {
   if (myTeam === oppTeam) throw new Error('같은 팀끼리는 경기할 수 없습니다.');
   var minutes = toInt_(r.minutes, 1, 60);
   if (minutes === null || MINUTES_.indexOf(minutes) < 0) throw new Error('경기 시간 값이 올바르지 않습니다.');
+  // 득점은 점수를 올리므로 경기 시간에 비례한 현실적인 상한을 둡니다.
+  // 실점은 많을수록 점수가 내려가므로(조작할 이유가 없음) 실제 경기 결과가 거부되지 않도록 전체 상한만 적용합니다.
   var goalCap = Math.min(GOALS_MAX_, minutes * GOALS_PER_MIN_);
   var gf = toInt_(r.goalsFor, 0, goalCap);
-  var ga = toInt_(r.goalsAgainst, 0, goalCap);
+  var ga = toInt_(r.goalsAgainst, 0, GOALS_MAX_);
   if (gf === null || ga === null) throw new Error('득점/실점 값이 올바르지 않습니다.');
   var difficulty = cleanText_(r.difficulty, 5);
   if (!Object.prototype.hasOwnProperty.call(DIFFICULTY_MULT_, difficulty)) {
