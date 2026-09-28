@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성모 사커</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,13 +20,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #cv{position:fixed;left:0;top:0;width:100vw;height:100vh;display:block;outline:none;touch-action:none}
 .hidden{display:none!important}
 .screen{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;padding:16px;z-index:10;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:max(16px, env(safe-area-inset-top, 0px));padding-bottom:max(16px, env(safe-area-inset-bottom, 0px));
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
   background:radial-gradient(ellipse at 50% 40%,rgba(3,10,6,.25),rgba(3,10,6,.78))}
 .screen.modal{background:rgba(2,8,5,.62);z-index:20}
 .panel{margin:auto;width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;
   box-shadow:0 24px 70px rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .panel.wide{max-width:980px}
 h2{font-family:var(--title);font-weight:400;font-size:28px;margin:0;letter-spacing:.5px}
-h3{font-size:14px;color:var(--muted);margin:18px 0 8px;font-weight:700;letter-spacing:.3px}
+h3{font-size:14px;color:var(--muted);margin:14px 0 7px;font-weight:700;letter-spacing:.3px}
 .phead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
 .btn{display:block;width:100%;margin:10px 0 0;padding:14px 16px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.07);
   color:var(--txt);font:800 17px var(--body);cursor:pointer;transition:transform .08s,background .15s}
@@ -38,6 +40,8 @@ h3{font-size:14px;color:var(--muted);margin:18px 0 8px;font-weight:700;letter-sp
 .btn[disabled]{opacity:.55;cursor:default}
 .back{background:none;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:7px 12px;font:700 14px var(--body);cursor:pointer}
 .row{display:flex;gap:10px}.row>*{flex:1}
+.setup-row{flex-wrap:wrap;column-gap:14px}.setup-row>*{flex:1 1 250px}
+input.txt#nick{padding:10px 14px}
 /* 타이틀 */
 .title-panel{text-align:center;max-width:430px;padding:30px 26px 22px}
 .logo{font-family:var(--title);font-size:64px;line-height:1;letter-spacing:2px;margin:6px 0 4px;
@@ -48,16 +52,18 @@ h3{font-size:14px;color:var(--muted);margin:18px 0 8px;font-weight:700;letter-sp
 .foot{margin-top:16px;color:var(--muted);font-size:12px}
 /* 팀 선택 */
 .teams{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.team-card{display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px;border-radius:13px;background:var(--panel2);
+.team-card{display:flex;flex-direction:column;gap:8px;text-align:left;padding:9px 10px;border-radius:13px;background:var(--panel2);
   border:2px solid transparent;color:inherit;font:inherit;cursor:pointer;min-width:0}
 .team-card:hover{background:rgba(255,255,255,.09)}
 .team-card.sel{border-color:var(--acc);background:rgba(250,204,21,.11)}
-.team-card.dis{opacity:.4}
+.team-card.dis{opacity:.32;cursor:not-allowed}
 .tc-top{display:flex;align-items:center;gap:8px;min-width:0}
 .kit{flex:none;width:30px;height:30px;border-radius:50%;border:4px solid;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .tn{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ta{font-size:11px;color:var(--muted);font-weight:700}
-.st{display:grid;grid-template-columns:34px 1fr 22px;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.st{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--muted);min-width:0}
+.st span{display:flex;justify-content:space-between;white-space:nowrap}.st b{color:#e2e8f0;font-weight:800}
 .bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#22c55e,#facc15)}
 .seg{display:flex;gap:6px}
@@ -66,7 +72,7 @@ h3{font-size:14px;color:var(--muted);margin:18px 0 8px;font-weight:700;letter-sp
 input.txt{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
   font:700 16px var(--body);outline:none;-webkit-user-select:text;user-select:text}
 input.txt:focus{border-color:var(--acc)}
-.vs{margin-top:16px;text-align:center;font-weight:800;font-size:16px;color:#e2e8f0}
+.vs{margin-top:12px;text-align:center;font-weight:800;font-size:16px;color:#e2e8f0}
 .vs b{color:var(--acc)}
 /* 도움말 */
 table.ctl{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
@@ -103,34 +109,70 @@ table.rank tr.me td{background:rgba(250,204,21,.1)}
 .spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--acc);animation:spin .8s linear infinite;margin:24px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 /* 상단 버튼 */
-#topbar{position:fixed;top:10px;right:10px;z-index:6;display:flex;gap:8px}
+#topbar{position:fixed;top:10px;right:10px;z-index:6;display:flex;gap:8px;
+  top:calc(10px + env(safe-area-inset-top, 0px));right:calc(10px + env(safe-area-inset-right, 0px))}
+#safeProbe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;
+  padding:env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px)}
 .icon-btn{width:42px;height:42px;border-radius:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.22);color:#fff;
   display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .icon-btn svg{width:22px;height:22px}
 /* 터치 컨트롤 */
 #touch{position:fixed;left:0;top:0;right:0;bottom:0;z-index:5;pointer-events:none}
-#joyZone{position:absolute;left:0;bottom:0;width:48%;height:70%;pointer-events:auto;touch-action:none}
+/* 조이스틱 영역은 오른쪽 버튼 묶음(#btns) 앞에서 끝나야 합니다 */
+#joyZone{position:absolute;left:0;bottom:0;width:48%;max-width:calc(100% - 200px);max-width:calc(100% - 200px - env(safe-area-inset-right, 0px));
+  height:70%;pointer-events:auto;touch-action:none}
 #joyBase{position:absolute;width:124px;height:124px;border-radius:50%;border:2px solid rgba(255,255,255,.38);background:rgba(255,255,255,.07);
-  left:34px;bottom:34px;pointer-events:none}
+  left:34px;bottom:34px;pointer-events:none;
+  left:calc(34px + env(safe-area-inset-left, 0px));bottom:calc(34px + env(safe-area-inset-bottom, 0px))}
 #joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.55);
   box-shadow:0 2px 10px rgba(0,0,0,.4)}
-#btns{position:absolute;right:10px;bottom:12px;width:236px;height:230px;pointer-events:none}
+#btns{position:absolute;right:10px;bottom:12px;width:180px;height:230px;pointer-events:none;
+  right:calc(10px + env(safe-area-inset-right, 0px));bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
 .tbtn{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(0,0,0,.38);color:#fff;
   font:800 15px var(--body);touch-action:none;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:0}
 .tbtn.on{background:rgba(250,204,21,.65);color:#111}
+/* 킥오프 버튼 줄: 스크롤해도 아래에 붙어 있고, 뒤의 내용이 비치지 않도록 불투명 배경 */
+.kick-bar{position:sticky;bottom:0;z-index:2;margin:0 -22px -22px;padding:4px 22px 16px;background:#0a1711;border-radius:0 0 20px 20px;
+  box-shadow:0 -14px 14px -4px #0a1711}
 #tb-shoot{width:88px;height:88px;right:4px;bottom:44px;border-color:#fca5a5;font-size:18px}
 #tb-pass{width:72px;height:72px;right:100px;bottom:4px;border-color:#86efac}
 #tb-through{width:64px;height:64px;right:104px;bottom:92px;border-color:#93c5fd}
 #tb-sprint{width:60px;height:60px;right:14px;bottom:146px}
-#tb-sw{width:54px;height:54px;right:176px;bottom:150px;font-size:13px}
+#tb-sw{width:54px;height:54px;right:98px;bottom:168px;font-size:13px}
+.show-sm{display:none}
 @media (max-width:760px){.teams{grid-template-columns:repeat(2,1fr)} .logo{font-size:52px}}
-@media (max-width:520px){.panel{padding:16px;border-radius:16px} h2{font-size:23px} .hide-sm{display:none}
-  table.rank th,table.rank td{padding:8px 5px;font-size:13px}}
-@media (max-height:520px){#btns{transform:scale(.82);transform-origin:right bottom} #joyBase{width:108px;height:108px;left:22px;bottom:18px}}
+@media (max-width:520px){.panel{padding:16px;border-radius:16px} h2{font-size:23px} .hide-sm{display:none} .show-sm{display:inline}
+  .kick-bar{margin:0 -16px -16px;padding:4px 16px 12px;border-radius:0 0 16px 16px}
+  table.rank th,table.rank td{padding:8px 5px;font-size:13px}
+  table.rank td.nk{max-width:96px;overflow:hidden;text-overflow:ellipsis}}
+/* 작은 화면: 설정(난이도·시간·닉네임)을 팀 목록보다 먼저, 팀 카드는 간단히 */
+@media (max-width:760px),(max-height:520px){
+  #scr-setup .panel{display:flex;flex-direction:column}
+  #scr-setup .phead{order:-2} #scr-setup .setup-row{order:-1}
+  .team-card{padding:7px 8px;gap:5px} .team-card .bar{display:none} .kit{width:24px;height:24px;border-width:3px}
+  .stats{gap:4px}}
+/* 가로 휴대폰 등 낮은 화면: 모달·메뉴를 한 화면에 들어오게 */
+@media (max-height:520px){
+  #btns{transform:scale(.82);transform-origin:right bottom} #joyBase{width:108px;height:108px;left:22px;bottom:18px;
+    left:calc(22px + env(safe-area-inset-left, 0px));bottom:calc(18px + env(safe-area-inset-bottom, 0px))}
+  .screen{padding:8px;padding-top:max(8px, env(safe-area-inset-top, 0px));padding-bottom:max(8px, env(safe-area-inset-bottom, 0px));
+    padding-left:max(8px, env(safe-area-inset-left, 0px));padding-right:max(8px, env(safe-area-inset-right, 0px))}
+  .panel{padding:12px 16px;border-radius:14px}
+  .kick-bar{margin:0 -16px -12px;padding:2px 16px 10px;border-radius:0 0 14px 14px}
+  h2{font-size:21px} h3{margin:8px 0 5px}
+  .btn{padding:9px 12px;font-size:15px;margin-top:7px;border-radius:11px} .btn.big{font-size:17px;padding:10px 12px}
+  .seg button{padding:8px 6px}
+  .title-panel{padding:14px 18px 12px} .logo{font-size:42px} .ball-ico{width:42px;height:42px} .logo-sub{margin-bottom:8px} .foot{margin-top:8px}
+  #halfStats,#resStats{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+  .statrow{margin:4px 0}
+  .res-title{font-size:32px;margin:0} .scoreline .num{font-size:30px} .scoreline{font-size:15px}
+  .points{margin:4px 0 0} .points b{font-size:22px} .msg{min-height:18px;margin-top:4px}
+  .rank-wrap{max-height:62vh}}
 </style>
 </head>
 <body>
 <canvas id="cv" tabindex="0" aria-label="성모 사커 경기 화면"></canvas>
+<div id="safeProbe" aria-hidden="true"></div>
 
 <div id="topbar" class="hidden">
   <button class="icon-btn" id="btnMute" title="소리 켜기/끄기" aria-label="소리 켜기/끄기"></button>
@@ -175,18 +217,21 @@ table.rank tr.me td{background:rgba(250,204,21,.1)}
     <div class="teams" id="myTeams"></div>
     <h3>상대 팀</h3>
     <div class="teams" id="oppTeams"></div>
-    <div class="row">
+    <div class="row setup-row">
       <div><h3>난이도</h3>
         <div class="seg" id="segDiff"><button data-v="쉬움">쉬움</button><button data-v="보통" class="sel">보통</button><button data-v="어려움">어려움</button></div>
       </div>
       <div><h3>경기 시간 (실제 시간)</h3>
         <div class="seg" id="segTime"><button data-v="2">2분</button><button data-v="4" class="sel">4분</button><button data-v="6">6분</button></div>
       </div>
+      <div><h3>닉네임</h3>
+        <input class="txt" id="nick" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" spellcheck="false">
+      </div>
     </div>
-    <h3>닉네임</h3>
-    <input class="txt" id="nick" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" spellcheck="false">
-    <div class="vs" id="vsLine"></div>
-    <button class="btn primary big" id="btnKick">킥오프!</button>
+    <div class="kick-bar">
+      <div class="vs" id="vsLine"></div>
+      <button class="btn primary big" id="btnKick">킥오프!</button>
+    </div>
   </div>
 </div>
 
@@ -290,6 +335,7 @@ function hasGAS() {
 function lsGet(k, def) { try { var v = window.localStorage.getItem(k); return v === null || v === undefined ? def : v; } catch (e) { return def; } }
 function lsSet(k, v) { try { window.localStorage.setItem(k, v); return true; } catch (e) { return false; } }
 function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function nowMs() { try { return (window.performance && performance.now) ? performance.now() : Date.now(); } catch (e) { return Date.now(); } }
 function fmtNow() {
   var d = new Date();
   return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
@@ -308,9 +354,11 @@ var BOX_D = 250, BOX_W = 560, SIX_D = 90, SIX_W = 280, PEN_SPOT = 170, CENTER_R 
 var PR = 12, BR = 6, POST_R = 5;
 var GRAV = 640, FRIC = 1.05, ROLL_DECEL = 22, AIR_DRAG = 0.12;
 var STEP = 1 / 60;
+var HALF_KEY_GRACE_MS = 800; // 하프타임 화면에서 키 입력을 무시하는 시간
 var PICKUP_MAX = 760;
 var BASE_SPEED = 160, SPRINT_MUL = 1.42;
 var H_PROJ = 0.55; // 높이(z) → 화면 y 투영 비율
+var CHEST_Z = 26;  // 패스 받는 선수가 가슴으로 공을 받아 낼 수 있는 최대 높이
 var VIEW_OUT_X = 125, VIEW_OUT_Y = 115;
 
 // 가상 팀 (실존 구단/선수와 무관)
@@ -339,13 +387,15 @@ var CORNER_SPOTS = [[0.93, 0.45], [0.90, 0.57], [0.87, 0.49], [0.84, 0.37], [0.8
 
 // 난이도별 AI 파라미터 (CPU 팀에 적용)
 var DIFFS = {
-  '쉬움':   { speed: 0.88, decision: 0.50, passNoise: 0.13, shotNoise: 0.15, tackle: 0.75, gkReact: 0.30, gkSave: 0.52, pressers: 1, tackleCd: 1.05, aggression: 0.5 },
-  '보통':   { speed: 0.97, decision: 0.32, passNoise: 0.075, shotNoise: 0.095, tackle: 1.0, gkReact: 0.21, gkSave: 0.68, pressers: 1, tackleCd: 0.8, aggression: 0.8 },
-  '어려움': { speed: 1.05, decision: 0.20, passNoise: 0.04, shotNoise: 0.06, tackle: 1.22, gkReact: 0.13, gkSave: 0.8, pressers: 2, tackleCd: 0.6, aggression: 1.0 }
+  '쉬움':   { speed: 0.88, decision: 0.50, passNoise: 0.13, shotNoise: 0.15, tackle: 0.75, gkReact: 0.20, gkSave: 0.55, pressers: 1, tackleCd: 1.05, aggression: 0.5 },
+  '보통':   { speed: 0.97, decision: 0.32, passNoise: 0.075, shotNoise: 0.095, tackle: 1.0, gkReact: 0.16, gkSave: 0.65, pressers: 1, tackleCd: 0.8, aggression: 0.8 },
+  '어려움': { speed: 1.05, decision: 0.20, passNoise: 0.04, shotNoise: 0.06, tackle: 1.22, gkReact: 0.12, gkSave: 0.75, pressers: 2, tackleCd: 0.6, aggression: 1.0 }
 };
+var GK_SHUFFLE = 0.55; // 반응 시간 동안 골키퍼 옆걸음 속도 비율
+var PARRY_WIDE = 0.4;  // 쳐낸 공이 골대 옆(코너킥)으로 나가는 비율
 // 사람 팀의 AI 동료
-var ALLY_AI = { speed: 1.0, decision: 0.3, passNoise: 0.06, shotNoise: 0.08, tackle: 1.0, gkReact: 0.19, gkSave: 0.72, pressers: 1, tackleCd: 0.75, aggression: 0.7 };
-var DEMO_AI = { speed: 0.97, decision: 0.3, passNoise: 0.07, shotNoise: 0.09, tackle: 1.0, gkReact: 0.2, gkSave: 0.7, pressers: 1, tackleCd: 0.8, aggression: 0.7 };
+var ALLY_AI = { speed: 1.0, decision: 0.3, passNoise: 0.06, shotNoise: 0.08, tackle: 1.0, gkReact: 0.15, gkSave: 0.68, pressers: 1, tackleCd: 0.75, aggression: 0.7 };
+var DEMO_AI = { speed: 0.97, decision: 0.3, passNoise: 0.07, shotNoise: 0.09, tackle: 1.0, gkReact: 0.16, gkSave: 0.66, pressers: 1, tackleCd: 0.8, aggression: 0.7 };
 var DIFF_MULT = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
 
 function computeScore(gf, ga, diff) {
@@ -366,7 +416,8 @@ var G = {
   toastText: '', toastT: 0, toastColor: '#fff', lastToastT: -9,
   bannerText: '', bannerSub: '', bannerT: 0, bannerDur: 1,
   dbg: { gkShot: 0, saves: 0, dives: 0 },
-  slowT: 0, saved: false, saving: false, touchMode: false, goalTeam: null, scorer: null, matchT: 0
+  slowT: 0, saved: false, saving: false, touchMode: false, goalTeam: null, scorer: null, matchT: 0,
+  matchId: 0, halfShownAt: 0
 };
 var ball = {
   x: CX, y: CY, z: 0, vx: 0, vy: 0, vz: 0, owner: null, kicker: null, kickTime: -9, ownT: 0,
@@ -554,6 +605,8 @@ function resetInput() {
   Input.released.shoot = false;
   Input.joy.active = false; Input.joy.x = Input.joy.y = 0; Input.joy.id = -1;
   var knob = $('joyKnob'); if (knob) knob.style.transform = '';
+  // 슛 충전 중에 일시정지/포커스 이탈이 일어나면 충전을 취소 (떼는 입력을 놓쳐 파워 바가 멈춰 남지 않도록)
+  if (G.human && G.human.ctrl) G.human.ctrl.charge = 0;
 }
 function readAxis() {
   var x, y;
@@ -585,7 +638,14 @@ window.addEventListener('keydown', function (e) {
     }
     return;
   }
-  if (G.mode === 'match' && G.phase === 'halftime' && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); startSecondHalf(); return; }
+  if (G.mode === 'match' && G.phase === 'halftime') {
+    if (e.code === 'Enter' || e.code === 'Space') {
+      e.preventDefault();
+      // 패스(Space)를 누르고 있던 자동 반복 입력이나, 하프타임 직후의 우발적인 입력으로 통계 화면이 넘어가지 않도록
+      if (!e.repeat && nowMs() - G.halfShownAt > HALF_KEY_GRACE_MS) startSecondHalf();
+    }
+    return;
+  }
   var a = keyAction(e);
   if (!a) return;
   if (G.mode === 'match' && !G.paused) {
@@ -605,7 +665,7 @@ window.addEventListener('keyup', function (e) {
 /* 터치 컨트롤 */
 function setupTouch() {
   var zone = $('joyZone'), base = $('joyBase'), knob = $('joyKnob');
-  var R = 52;
+  var R = 52; // 손잡이 최대 이동 반경 (받침 크기에 비례해 pointerdown 때 다시 계산)
   function joyMove(e) {
     var dx = e.clientX - Input.joy.cx, dy = e.clientY - Input.joy.cy, m = Math.sqrt(dx * dx + dy * dy);
     if (m > R) { dx = dx / m * R; dy = dy / m * R; }
@@ -619,8 +679,12 @@ function setupTouch() {
     if (Input.joy.id !== -1) return;
     Input.joy.id = e.pointerId; Input.joy.active = true;
     var zr = zone.getBoundingClientRect();
-    var bx = clamp(e.clientX - zr.left, 64, zr.width - 64), by = clamp(e.clientY - zr.top, 64, zr.height - 64);
-    base.style.left = (bx - 62) + 'px'; base.style.top = (by - 62) + 'px'; base.style.bottom = 'auto';
+    // 받침 크기는 화면에 따라 CSS 로 바뀌므로(124px / 108px) 실제 크기로 계산해 손가락 바로 아래에 놓습니다.
+    var hb = (base.offsetWidth || 124) / 2;
+    R = hb * 0.84;
+    var bx = clamp(e.clientX - zr.left, hb + 2 + safe.l, Math.max(hb + 2 + safe.l, zr.width - hb - 2));
+    var by = clamp(e.clientY - zr.top, hb + 2, Math.max(hb + 2, zr.height - hb - 2 - safe.b));
+    base.style.left = (bx - hb) + 'px'; base.style.top = (by - hb) + 'px'; base.style.bottom = 'auto';
     Input.joy.cx = zr.left + bx; Input.joy.cy = zr.top + by;
     try { zone.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
     joyMove(e);
@@ -669,7 +733,7 @@ function updateTouchLabels() {
   $('tb-pass').textContent = atk ? '패스' : '태클';
   $('tb-shoot').textContent = atk ? '슛' : '슬라이딩';
   $('tb-shoot').style.fontSize = atk ? '18px' : '13px';
-  $('tb-through').textContent = atk ? '스루' : '-';
+  $('tb-through').style.opacity = atk ? '' : '0.4';
 }
 
 /* =====================================================================
@@ -697,11 +761,28 @@ function makePlayer(team, f, i) {
     decT: 0, charge: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6
   };
 }
+// 두 유니폼이 얼마나 잘 구분되는지 (셔츠 색 차이 + 밝기 차이 + 테두리 차이)
+function kitContrast(a, b) {
+  return colorDist(a.shirt, b.shirt) + Math.abs(lum(a.shirt) - lum(b.shirt)) * 160 + colorDist(a.trim, b.trim) * 0.25;
+}
+function pickKits(defA, defB) {
+  // 우선순위: (홈,홈) → (홈,원정) → (원정,홈) → (원정,원정). 충분히 구분되면 그 조합 사용, 아니면 가장 잘 구분되는 조합.
+  var combos = [[false, false], [false, true], [true, false], [true, true]], best = null, bs = -1;
+  for (var i = 0; i < combos.length; i++) {
+    var ka = makeKit(defA, combos[i][0]), kb = makeKit(defB, combos[i][1]);
+    var c = kitContrast(ka, kb);
+    if (defA !== defB || combos[i][0] !== combos[i][1]) {
+      if (c >= 240) { best = [ka, kb]; break; }
+      if (c > bs) { bs = c; best = [ka, kb]; }
+    }
+  }
+  return best;
+}
 function setupTeams(defA, defB, aiA, aiB, humanA) {
-  var kitA = makeKit(defA, false);
-  var clash = defA === defB || colorDist(kitA.shirt, defB.home[0]) < 130 || colorDist(kitA.shirt, defB.home[1]) < 40 && colorDist(kitA.trim, defB.home[0]) < 60;
-  var kitB = makeKit(defB, clash);
+  var kits = pickKits(defA, defB), kitA = kits[0], kitB = kits[1];
   if (colorDist(kitA.gk, kitB.gk) < 90) kitB.gk = '#e5e7eb';
+  if (colorDist(kitB.gk, kitA.shirt) < 90 || colorDist(kitB.gk, kitB.shirt) < 90) kitB.gk = '#e5e7eb';
+  if (colorDist(kitA.gk, kitB.shirt) < 90 || colorDist(kitA.gk, kitA.shirt) < 90) kitA.gk = '#fb923c';
   var A = makeTeam(defA, 0, humanA, aiA, kitA), B = makeTeam(defB, 1, false, aiB, kitB);
   A.opp = B; B.opp = A;
   G.teams = [A, B]; G.players = []; G.drawList = [];
@@ -895,8 +976,12 @@ function laneClear(t, ax, ay, bx, by) {
   return bd;
 }
 function ballPosAt(t, out) {
-  var f = (1 - Math.exp(-FRIC * t)) / FRIC;
-  out.x = ball.x + ball.vx * f; out.y = ball.y + ball.vy * f;
+  var b = ball, tl = 0;
+  // 뜬 공은 떨어질 때까지 거의 감속 없이 날아가므로, 착지 시점까지는 직선 비행으로 예측합니다.
+  if (b.z > 0.5 || b.vz > 0) tl = (b.vz + Math.sqrt(b.vz * b.vz + 2 * GRAV * Math.max(0, b.z))) / GRAV;
+  if (t <= tl) { out.x = b.x + b.vx * t; out.y = b.y + b.vy * t; return; }
+  var k = tl > 0 ? 0.8 : 1, f = (1 - Math.exp(-FRIC * (t - tl))) / FRIC;
+  out.x = b.x + b.vx * tl + b.vx * k * f; out.y = b.y + b.vy * tl + b.vy * k * f;
 }
 function interceptPoint(p, out) {
   var t = 0;
@@ -1017,6 +1102,9 @@ function tryTackle(d, c, bonus) {
   if (c.holding) return false;
   var pr = 0.2 + bonus + (d.team.def.def - c.team.def.att) / 180 + (d.team.ai.tackle - 1) * 0.2;
   if (c.desSprint) pr += 0.07;
+  // 가만히 서서 공을 끄는 선수는 뺏기기 쉽습니다
+  var cs = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
+  if (cs < 45) pr += 0.12;
   if (d.role === 'GK') pr += 0.25;
   pr = clamp(pr, 0.05, 0.9);
   if (Math.random() >= pr) return false;
@@ -1045,9 +1133,18 @@ function gkCatch(g) {
   g.holding = true; g.holdT = rand(0.8, 1.4); g.diveT = 0; g.vx = g.vy = 0; g.gkMiss = 0;
 }
 function parry(g) {
-  var b = ball;
+  var b = ball, dir = g.team.dir;
   b.owner = null;
-  b.vx = g.team.dir * rand(160, 300); b.vy = (b.y < g.y ? -1 : 1) * rand(170, 330); b.vz = rand(80, 170);
+  b.vx = dir * rand(160, 300); b.vy = (b.y < g.y ? -1 : 1) * rand(170, 330); b.vz = rand(80, 170);
+  if (Math.random() < PARRY_WIDE) {
+    // 골대 옆으로 쳐내기 → 골라인 밖으로 나가 코너킥. 공이 골대 사이로 들어가지 않도록 각도를 제한합니다.
+    var sy = b.y === CY ? (Math.random() < 0.5 ? -1 : 1) : (b.y < CY ? -1 : 1);
+    var vy = rand(260, 380), dx = Math.abs(b.x - ownGoalX(g.team)), off = Math.abs(b.y - CY);
+    var need = GOAL_HALF + POST_R + BR + 18 - off; // 골라인에 닿을 때 필요한 옆 이동 거리
+    var vxMax = need > 0 ? vy * dx / need : 1e9;
+    var vx = Math.min(rand(30, 120), vxMax * 0.9);
+    if (vx > 8) { b.vx = -dir * vx; b.vy = sy * vy; b.vz = rand(60, 150); }
+  }
   b.kicker = g; b.kickTime = G.time; b.lastTouch = g; b.lastTeam = g.team;
   b.shotBy = null; b.passTarget = null; b.pendingPass = null;
   Snd.kick(0.4);
@@ -1059,7 +1156,11 @@ function gkContact(g) {
   var isShot = b.shotBy && b.shotBy.team !== g.team;
   if (isShot) G.dbg.gkShot++;
   if (!isShot || rs < 420) { gkCatch(g); return; }
-  var pr = g.team.ai.gkSave + 0.15 - clamp((rs - 760) / 2000, 0, 0.25) - (b.z > 36 ? 0.1 : 0);
+  // 골대 구석(포스트 가까이)으로 향하는 슛일수록 막기 어렵습니다.
+  var gx = ownGoalX(g.team), cornerY = CY;
+  if (Math.abs(b.vx) > 1) cornerY = b.y + b.vy * (gx - b.x) / b.vx;
+  var pr = g.team.ai.gkSave - clamp((rs - 760) / 2000, 0, 0.25) - (b.z > 36 ? 0.1 : 0) -
+    (Math.abs(cornerY - CY) > GOAL_HALF - 25 ? 0.15 : 0);
   if (Math.random() < pr) {
     G.dbg.saves++;
     if (rs < 830 && Math.random() < 0.6) gkCatch(g); else parry(g);
@@ -1081,13 +1182,18 @@ function deflect(p) {
   b.shotBy = null;
   Snd.kick(0.3);
 }
+function headerShotZone(p) {
+  var t = p.team;
+  return dist(p.x, p.y, oppGoalX(t), CY) < 290 && fwdN(t, p.x) > 0.72;
+}
 function doHeader(p) {
   var t = p.team, gx = oppGoalX(t), b = ball;
   p.headerCd = 0.6;
-  if (b.pendingPass === t && !G.demo) t.stats.passOk++;
+  var shotZone = headerShotZone(p);
+  // 패스 성공은 공을 실제로 받았을 때(setOwner)나, 크로스를 동료가 헤딩슛으로 연결했을 때만 셉니다.
+  if (b.pendingPass === t && shotZone && !G.demo) t.stats.passOk++;
   b.pendingPass = null;
-  var dG = dist(p.x, p.y, gx, CY);
-  if (dG < 290 && fwdN(t, p.x) > 0.72) {
+  if (shotZone) {
     var aim = CY + rand(-1, 1) * (GOAL_HALF - 15);
     var ang = Math.atan2(aim - b.y, gx - b.x) + gauss() * 0.13;
     kickBall(p, Math.cos(ang) * 560, Math.sin(ang) * 560, -30, 0.5);
@@ -1122,12 +1228,13 @@ function pickReceiver(p, dx, dy, through) {
     var r = t.players[i]; if (r === p) continue;
     var rx = r.x - p.x, ry = r.y - p.y, d = Math.sqrt(rx * rx + ry * ry); if (d < 25) continue;
     var c = (rx * dx + ry * dy) / d;
-    var lane = clamp(laneClear(t, p.x, p.y, r.x, r.y) / 60, 0, 1);
-    var s = c * 2.4 - d / 900 + lane * 0.5 - (r.role === 'GK' ? 1.3 : 0);
+    var lc = laneClear(t, p.x, p.y, r.x, r.y), lane = clamp(lc / 60, 0, 1);
+    var s = c * 2.4 - d / 900 + lane * 1.2 - (lc < 15 ? 1.5 : 0) - (r.role === 'GK' ? 1.3 : 0);
     if (through) s += (fwdN(t, r.x) - fwdN(t, p.x)) * 1.5;
     if (c > 0.45 && s > bs) { bs = s; best = r; }
-    if (s > fbs) { fbs = s; fb = r; }
+    if (c > 0.1 && s > fbs) { fbs = s; fb = r; }
   }
+  // 입력 방향과 거의 맞는 동료가 없으면 null → 입력 방향 빈 공간으로 찹니다 (등 뒤로 패스하지 않음)
   return best || fb;
 }
 function humanPass(p, dx, dy, kind) {
@@ -1167,6 +1274,8 @@ function humanSetPiece(p, mode, ax, ay, mag) {
 }
 function humanStep(dt) {
   var H = G.human, t = H.team, ph = G.phase;
+  // 슛 충전은 인플레이 중에만 유효 (아웃·골·세트피스로 바뀌면 취소)
+  if (ph !== 'play' && H.ctrl) H.ctrl.charge = 0;
   if (ph !== 'play' && ph !== 'setpiece' && ph !== 'kickoff') return;
   H.switchT -= dt;
   var p = H.ctrl;
@@ -1209,6 +1318,8 @@ function humanStep(dt) {
   else if (!ball.owner && ball.passTarget === p) { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, Input.held.sprint, 16); }
   else if (!hasBall && Input.held.pass && ball.owner && ball.owner.team !== t) { steerTo(p, ball.x, ball.y, Input.held.sprint, 8); }
   if (ph !== 'play') return;
+  // K 를 떼는 순간을 놓친 경우(키 입력 유실 등) 남아 있는 충전 취소
+  if (p.charge > 0 && !Input.held.shoot && !Input.released.shoot) p.charge = 0;
   if (hasBall) {
     var dx = mag > 0.15 ? ax : p.fx, dy = mag > 0.15 ? ay : p.fy;
     if (Input.pressed.pass) humanPass(p, dx, dy, 'ground');
@@ -1446,14 +1557,17 @@ function aiGK(p, dt) {
   if (!b.owner && b.vx * dir < -220 && G.phase === 'play') {
     if (predictAtX(p.x, TMP2) && TMP2.t < 1.3 && Math.abs(TMP2.y - CY) < GOAL_HALF + 45 && TMP2.z < CROSSBAR + 25) {
       p.react += dt;
+      var dy = TMP2.y - p.y;
       if (p.react >= t.ai.gkReact) {
-        var dy = TMP2.y - p.y;
         if (Math.abs(dy) > 16 && TMP2.t < 0.55 && p.diveCd <= 0) {
           var ds = clamp(Math.abs(dy) / Math.max(TMP2.t, 0.12), 150, 400);
           G.dbg.dives++;
           p.diveT = 0.5; p.diveCd = 1.0; p.vx = 0; p.vy = (dy > 0 ? 1 : -1) * ds; p.sdx = 0; p.sdy = dy > 0 ? 1 : -1;
         } else steerTo(p, p.x, TMP2.y, true, 6);
-      } else { p.desX = p.desY = 0; }
+      } else {
+        // 반응 시간 동안에도 멈춰 서지 않고 공 쪽으로 천천히 옆걸음 (다이빙만 반응 시간 뒤에 가능)
+        steerTo(p, p.x, TMP2.y, false, 6); p.desX *= GK_SHUFFLE; p.desY *= GK_SHUFFLE;
+      }
       return;
     }
   }
@@ -1529,7 +1643,7 @@ function movePlayer(p, dt) {
         dist(p.x, p.y, ball.x, ball.y) < PR + BR + 8) {
       p.slideHit = true;
       var c = ball.owner;
-      var pr = clamp(0.62 + (p.team.def.def - c.team.def.att) / 150 + (p.team.ai.tackle - 1) * 0.15, 0.3, 0.92);
+      var pr = clamp(0.72 + (p.team.def.def - c.team.def.att) / 150 + (p.team.ai.tackle - 1) * 0.15, 0.3, 0.92);
       if (Math.random() < pr) {
         looseBall(c, p, p.sdx * 260 + rand(-60, 60), p.sdy * 260 + rand(-60, 60));
         c.stun = 0.6; c.charge = 0;
@@ -1608,10 +1722,16 @@ function updateBall(dt) {
     var ps = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
     var lead = p.holding ? PR - 2 : PR + BR + 1 + Math.min(9, ps * 0.03);
     var tx = p.x + p.fx * lead, ty = p.y + p.fy * lead;
-    var k = Math.min(1, 22 * dt);
+    var k = Math.min(1, 22 * dt), prevX = b.x;
     b.x += (tx - b.x) * k; b.y += (ty - b.y) * k;
     b.vx = p.vx; b.vy = p.vy; b.vz = 0; b.z = p.holding ? 9 : 0;
     b.spin += ps * dt / BR;
+    // 공을 몰고 골라인(골대 사이)을 넘거나 골대에 부딪히면 공을 놓고 일반 공 물리(골 판정·골대 충돌)로 넘깁니다.
+    if (G.phase === 'play' && carriedBallAtGoal(prevX)) {
+      p.holding = false;
+      b.owner = null; b.kicker = p; b.kickTime = G.time;
+      goalFrame(prevX);
+    }
     return;
   }
   var sp = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
@@ -1632,6 +1752,18 @@ function updateBall(dt) {
   if (G.phase === 'out' || G.phase === 'goal') { b.vx *= 1 - Math.min(1, 1.5 * dt); b.vy *= 1 - Math.min(1, 1.5 * dt); }
   b.x = clamp(b.x, -160, PW + 160); b.y = clamp(b.y, -150, PH + 150);
   b.spin += Math.sqrt(b.vx * b.vx + b.vy * b.vy) * dt / BR;
+}
+function carriedBallAtGoal(prevX) {
+  var b = ball, rr = POST_R + BR;
+  if (Math.abs(b.y - CY) < GOAL_HALF && ((prevX >= 0 && b.x < 0) || (prevX <= PW && b.x > PW))) return true;
+  for (var s = 0; s < 2; s++) {
+    var lx = s === 0 ? 0 : PW;
+    for (var k = -1; k <= 1; k += 2) {
+      var dx = b.x - lx, dy = b.y - (CY + k * GOAL_HALF);
+      if (dx * dx + dy * dy < rr * rr) return true;
+    }
+  }
+  return false;
 }
 function goalFrame(prevX) {
   var b = ball, rr = POST_R + BR;
@@ -1680,8 +1812,10 @@ function checkBallContacts() {
     var reach = PR + BR + 3 + (gk ? (p.diveT > 0 ? 16 : 9) : 0) + (p.slideT > 0 ? 5 : 0);
     var dx = b.x - p.x, dy = b.y - p.y, d2 = dx * dx + dy * dy;
     if (d2 > (reach + 4) * (reach + 4)) continue;
-    if (b.z > (gk ? 60 : 16)) {
-      if (!gk && b.z < 46 && p.headerCd <= 0 && p.slideT <= 0 && !head) head = p;
+    // 우리 팀 로빙/크로스를 받는 선수는 (슈팅 지역이 아니면) 헤딩으로 걷어내지 않고 가슴·발로 받아 둡니다.
+    var recv = !gk && (p === b.passTarget || (b.pendingPass && b.pendingPass === p.team));
+    if (b.z > (gk ? 60 : (recv ? CHEST_Z : 16))) {
+      if (!gk && b.z < 46 && p.headerCd <= 0 && p.slideT <= 0 && !head && (!recv || headerShotZone(p))) head = p;
       continue;
     }
     if (d2 > reach * reach) continue;
@@ -1793,7 +1927,17 @@ function clearEdges() {
  * ===================================================================== */
 var cv = $('cv'), ctx = cv.getContext('2d');
 var view = { w: 800, h: 600, dpr: 1 };
-var cam = { x: CX, y: CY, zoom: 1 };
+var cam = { x: CX, y: CY, zoom: 1, portrait: false, lead: 0 };
+var PORTRAIT_VIEW_W = 820;
+var safe = { t: 0, r: 0, b: 0, l: 0 }; // 노치·홈 인디케이터 영역 (CSS env(safe-area-inset-*))
+function readSafeArea() {
+  try {
+    var pr = $('safeProbe'); if (!pr) return;
+    var cs = window.getComputedStyle(pr);
+    safe.t = parseFloat(cs.paddingTop) || 0; safe.r = parseFloat(cs.paddingRight) || 0;
+    safe.b = parseFloat(cs.paddingBottom) || 0; safe.l = parseFloat(cs.paddingLeft) || 0;
+  } catch (e) { safe.t = safe.r = safe.b = safe.l = 0; }
+}
 var crowdPat = null;
 function resize() {
   var w = window.innerWidth || document.documentElement.clientWidth || 800;
@@ -1802,12 +1946,19 @@ function resize() {
   view.w = w; view.h = h; view.dpr = dpr;
   cv.width = Math.max(1, Math.round(w * dpr)); cv.height = Math.max(1, Math.round(h * dpr));
   cv.style.width = w + 'px'; cv.style.height = h + 'px';
-  if (h > w * 1.1) cam.zoom = clamp(w / 720, 0.42, 1.2);
+  cam.portrait = h > w * 1.1;
+  // 세로 화면: 경기장 길이 방향(좌우)으로 최소 약 PORTRAIT_VIEW_W 만큼 보이도록 축소 (위아래 여백은 감수)
+  if (cam.portrait) cam.zoom = clamp(w / PORTRAIT_VIEW_W, 0.42, 1.2);
   else cam.zoom = clamp(Math.sqrt(w * h / (980 * 600)), 0.5, 1.7);
+  readSafeArea();
 }
 function updateCamera(dt) {
-  var tx = ball.x + ball.vx * 0.18, ty = ball.y - ball.z * H_PROJ + ball.vy * 0.18;
   var vw = view.w / cam.zoom, vh = view.h / cam.zoom;
+  // 공을 가진(마지막으로 만진) 팀의 공격 방향으로 화면을 앞당겨 패스·슛 대상이 보이게 합니다.
+  var lt = ball.owner ? ball.owner.team : ball.lastTeam, lead = 0;
+  if (lt && (G.phase === 'play' || G.phase === 'setpiece' || G.phase === 'kickoff')) lead = lt.dir * vw * (cam.portrait ? 0.2 : 0.07);
+  cam.lead += (lead - cam.lead) * Math.min(1, dt * 1.5);
+  var tx = ball.x + ball.vx * 0.18 + cam.lead, ty = ball.y - ball.z * H_PROJ + ball.vy * 0.18;
   var minX = -VIEW_OUT_X + vw / 2, maxX = PW + VIEW_OUT_X - vw / 2;
   var minY = -VIEW_OUT_Y + vh / 2, maxY = PH + VIEW_OUT_Y - vh / 2;
   tx = minX > maxX ? CX : clamp(tx, minX, maxX);
@@ -2003,7 +2154,7 @@ function drawWorld() {
     ctx.fillStyle = st > 0.5 ? '#4ade80' : (st > 0.25 ? '#facc15' : '#f87171');
     ctx.fillRect(sx, sy, 30 * st, 4);
     // 슛 파워
-    if (ctrl.charge > 0) {
+    if (ctrl.charge > 0 && G.phase === 'play') {
       var bx = ctrl.x - 22, by = ctrl.y - PR - 34;
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(bx - 2, by - 2, 48, 10);
       var c = ctrl.charge;
@@ -2026,7 +2177,7 @@ function fmtClock() {
 function drawHUD() {
   var W = view.w, H = view.h, A = G.teams[0], B = G.teams[1];
   var sc = W < 520 ? 0.82 : 1;
-  ctx.save(); ctx.translate(10, 10); ctx.scale(sc, sc);
+  ctx.save(); ctx.translate(10 + safe.l, 10 + safe.t); ctx.scale(sc, sc);
   rrect(0, 0, 300, 40, 10); ctx.fillStyle = 'rgba(6,14,10,0.84)'; ctx.fill();
   ctx.fillStyle = A.kit.shirt; ctx.fillRect(8, 9, 7, 22); ctx.fillStyle = A.kit.trim; ctx.fillRect(15, 9, 3, 22);
   ctx.fillStyle = B.kit.shirt; ctx.fillRect(178, 9, 7, 22); ctx.fillStyle = B.kit.trim; ctx.fillRect(175, 9, 3, 22);
@@ -2043,10 +2194,11 @@ function drawHUD() {
   ctx.restore();
 
   // 미니맵
-  var mw = Math.min(210, W * 0.34), mh = mw * PH / PW, mx = (W - mw) / 2, my = H - mh - 10;
-  if (G.touchMode) { mx = W - mw - 10; my = 60; }
+  // 화면의 짧은 쪽 길이에 맞춰 크기를 정해, 가로 휴대폰에서 경기 화면을 너무 가리지 않게 합니다.
+  var mw = Math.min(210, W * 0.34, H * (H < 450 ? 0.3 : 0.4)), mh = mw * PH / PW, mx = (W - mw) / 2, my = H - mh - 10 - safe.b;
+  if (G.touchMode) { mx = W - mw - 10 - safe.r; my = 60 + safe.t; }
   var s = mw / PW;
-  ctx.fillStyle = 'rgba(20,83,45,0.72)'; ctx.fillRect(mx, my, mw, mh);
+  ctx.fillStyle = G.touchMode ? 'rgba(20,83,45,0.5)' : 'rgba(20,83,45,0.72)'; ctx.fillRect(mx, my, mw, mh);
   ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1;
   ctx.strokeRect(mx + 0.5, my + 0.5, mw - 1, mh - 1);
   ctx.beginPath(); ctx.moveTo(mx + mw / 2, my); ctx.lineTo(mx + mw / 2, my + mh); ctx.stroke();
@@ -2236,16 +2388,19 @@ function teamCard(i, which) {
   var nm = el('div'); nm.style.minWidth = '0';
   nm.appendChild(el('div', 'tn', t.name)); nm.appendChild(el('div', 'ta', t.abbr));
   top.appendChild(kit); top.appendChild(nm); b.appendChild(top);
-  var st = [['공격', t.att], ['수비', t.def], ['스피드', t.spd]];
+  var st = [['공격', t.att], ['수비', t.def], ['속도', t.spd]], stats = el('div', 'stats');
   for (var k = 0; k < st.length; k++) {
-    var row = el('div', 'st'); row.appendChild(el('span', '', st[k][0]));
+    var row = el('div', 'st'), lab = el('span');
+    lab.appendChild(document.createTextNode(st[k][0])); lab.appendChild(el('b', '', String(st[k][1])));
     var bar = el('div', 'bar'), fill = el('i'); fill.style.width = clamp((st[k][1] - 60) / 35 * 100, 5, 100) + '%';
-    bar.appendChild(fill); row.appendChild(bar); row.appendChild(el('span', '', String(st[k][1])));
-    b.appendChild(row);
+    bar.appendChild(fill); row.appendChild(lab); row.appendChild(bar);
+    stats.appendChild(row);
   }
+  b.appendChild(stats);
+  b.title = t.name + ' · 공격 ' + t.att + ' / 수비 ' + t.def + ' / 속도 ' + t.spd;
   b.addEventListener('click', function () {
     if (which === 'my') { setup.my = i; if (setup.opp === i) setup.opp = (i + 1) % TEAMS.length; }
-    else setup.opp = i;
+    else if (i !== setup.my) setup.opp = i;
     renderSetup();
   });
   return b;
@@ -2261,6 +2416,10 @@ function renderSetup() {
   for (i = 0; i < TEAMS.length; i++) {
     my.children[i].classList.toggle('sel', i === setup.my);
     op.children[i].classList.toggle('sel', i === setup.opp);
+    op.children[i].classList.toggle('dis', i === setup.my);
+    op.children[i].setAttribute('aria-disabled', i === setup.my ? 'true' : 'false');
+    my.children[i].setAttribute('aria-pressed', i === setup.my ? 'true' : 'false');
+    op.children[i].setAttribute('aria-pressed', i === setup.opp ? 'true' : 'false');
   }
   var segs = [['segDiff', setup.diff], ['segTime', String(setup.min)]];
   for (var s = 0; s < segs.length; s++) {
@@ -2285,11 +2444,13 @@ function startDemo() {
   G.half = 1; G.clock = 0; G.halfLen = 1e9; G.time = 0; G.slowT = 0;
   G.firstKick = G.teams[0];
   kickoff(G.teams[0]);
-  cam.x = CX; cam.y = CY;
+  cam.x = CX; cam.y = CY; cam.lead = 0;
 }
 function startMatch(cfg) {
   Snd.init();
   G.cfg = cfg; G.demo = false; G.mode = 'match'; G.paused = false; G.saved = false; G.saving = false;
+  G.matchId++; // 이전 경기의 저장 응답이 늦게 도착해도 이 경기 상태를 건드리지 않도록 구분
+  G.halfShownAt = 0;
   setupTeams(TEAMS[cfg.my], TEAMS[cfg.opp], ALLY_AI, DIFFS[cfg.diff], true);
   G.half = 1; G.clock = 0; G.halfLen = cfg.min * 60 / 2; G.time = 0; G.matchT = 0; G.slowT = 0;
   G.toastT = 0; G.bannerT = 0;
@@ -2300,7 +2461,7 @@ function startMatch(cfg) {
   $('touch').classList.toggle('hidden', !G.touchMode);
   touchLabelsAtk = null;
   kickoff(G.firstKick);
-  cam.x = CX; cam.y = CY;
+  cam.x = CX; cam.y = CY; cam.lead = 0;
   Snd.crowdStart();
   banner('킥오프!', G.teams[0].def.name + ' vs ' + G.teams[1].def.name, 1.8);
   focusCanvas();
@@ -2345,6 +2506,7 @@ function scoreLine(container, A, B) {
   container.appendChild(el('div', 'tname', B.def.name));
 }
 function showHalftime() {
+  G.halfShownAt = nowMs();
   scoreLine($('halfScore'), G.teams[0], G.teams[1]);
   statRows($('halfStats'), G.teams[0], G.teams[1]);
   show('half');
@@ -2372,13 +2534,16 @@ function showResult() {
 }
 function setSaveMsg(text, cls) { var m = $('saveMsg'); m.textContent = text; m.className = 'msg' + (cls ? ' ' + cls : ''); }
 function saveRecord() {
-  if (G.saved || G.saving || !G.cfg || !G.teams.length) return;
-  var A = G.teams[0], B = G.teams[1];
-  var rec = { nickname: G.cfg.nick, myTeam: A.def.name, oppTeam: B.def.name, goalsFor: A.score, goalsAgainst: B.score, difficulty: G.cfg.diff };
+  if (G.saved || G.saving || !G.cfg || !G.teams.length || G.mode !== 'result') return;
+  var A = G.teams[0], B = G.teams[1], id = G.matchId;
+  var rec = { nickname: G.cfg.nick, myTeam: A.def.name, oppTeam: B.def.name, goalsFor: A.score, goalsAgainst: B.score,
+    difficulty: G.cfg.diff, minutes: G.cfg.min };
   G.saving = true;
   $('btnSave').disabled = true; $('btnSave').textContent = '저장 중...';
   setSaveMsg(Store.online() ? '서버에 저장하는 중입니다...' : '이 기기에 저장하는 중입니다...', 'info');
   Store.save(rec, function (res) {
+    // 그 사이 '다시 하기' 등으로 새 경기가 시작됐다면 이 응답은 새 경기의 저장 상태/화면을 바꾸지 않습니다.
+    if (id !== G.matchId) return;
     G.saving = false;
     if (res && res.ok) {
       G.saved = true;
@@ -2389,6 +2554,10 @@ function saveRecord() {
       setSaveMsg((res && res.message) || '저장에 실패했습니다.', 'err');
     }
   });
+}
+function teamAbbr(name) {
+  for (var i = 0; i < TEAMS.length; i++) if (TEAMS[i].name === String(name)) return TEAMS[i].abbr;
+  return String(name);
 }
 var rankReq = 0;
 function loadRank() {
@@ -2412,8 +2581,14 @@ function loadRank() {
       var r = list[i], tr = el('tr');
       if (myNick && String(r.nickname) === myNick) tr.className = 'me';
       tr.appendChild(el('td', 'rk' + (i < 3 ? ' rk' + (i + 1) : ''), String(i + 1)));
-      tr.appendChild(el('td', '', String(r.nickname)));
-      tr.appendChild(el('td', '', String(r.myTeam) + ' ' + (Number(r.goalsFor) || 0) + ':' + (Number(r.goalsAgainst) || 0) + ' ' + String(r.oppTeam) + ' (' + String(r.result) + ')'));
+      var nk = el('td', 'nk', String(r.nickname)); nk.title = String(r.nickname);
+      tr.appendChild(nk);
+      // 좁은 화면에서는 팀 약칭으로 줄여 점수 칸이 화면 밖으로 밀리지 않게 합니다.
+      var gl = (Number(r.goalsFor) || 0) + ':' + (Number(r.goalsAgainst) || 0), gm = el('td', 'gm');
+      gm.appendChild(el('span', 'hide-sm', String(r.myTeam) + ' ' + gl + ' ' + String(r.oppTeam) + ' (' + String(r.result) + ')'));
+      gm.appendChild(el('span', 'show-sm', teamAbbr(r.myTeam) + ' ' + gl + ' ' + teamAbbr(r.oppTeam) + ' ' + String(r.result)));
+      gm.title = String(r.myTeam) + ' ' + gl + ' ' + String(r.oppTeam) + ' (' + String(r.result) + ')';
+      tr.appendChild(gm);
       tr.appendChild(el('td', 'hide-sm', String(r.difficulty)));
       tr.appendChild(el('td', 'hide-sm', String(r.date)));
       tr.appendChild(el('td', 'sc', String(Number(r.score) || 0)));

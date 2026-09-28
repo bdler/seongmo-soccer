@@ -23,7 +23,13 @@ var TEAM_NAMES_ = [
 var DIFFICULTY_MULT_ = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
 var RESULTS_ = ['승', '무', '패'];
 var NICK_MAX_ = 12;
-var GOALS_MAX_ = 30;
+// 경기 시간(분) 화이트리스트와 현실적인 득점 상한 (한 팀 기준, 분당 최대 GOALS_PER_MIN_ 골)
+var MINUTES_ = [2, 4, 6];
+var GOALS_PER_MIN_ = 4;
+var GOALS_MAX_ = 24;
+// 저장 요청 제한 (CacheService): 전체 분당 최대 저장 수, 같은 닉네임 연속 저장 간격(초)
+var RATE_GLOBAL_PER_MIN_ = 30;
+var RATE_NICK_COOLDOWN_SEC_ = 15;
 
 /**
  * 웹 앱 진입점.
@@ -31,13 +37,13 @@ var GOALS_MAX_ = 30;
 function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('성모 사커')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
  * 경기 결과 저장.
- * @param {{nickname:string, myTeam:string, oppTeam:string, goalsFor:number, goalsAgainst:number, difficulty:string}} record
+ * @param {{nickname:string, myTeam:string, oppTeam:string, goalsFor:number, goalsAgainst:number, difficulty:string, minutes:number}} record
  * @return {{ok:boolean, message?:string, score?:number, result?:string}}
  */
 function saveMatchResult(record) {
@@ -53,19 +59,23 @@ function saveMatchResult(record) {
     return { ok: false, message: '서버가 혼잡합니다. 잠시 후 다시 시도해 주세요.' };
   }
   try {
+    var limited = checkRateLimit_(clean.nickname);
+    if (limited) return { ok: false, message: limited };
     var sheet = getOrCreateSheet_();
+    // 글자 칸은 모두 textCell_ 로 감싸 시트가 숫자/날짜/불리언/수식으로 바꾸지 않게 합니다.
     sheet.appendRow([
       new Date(),
-      safeCell_(clean.nickname),
-      safeCell_(clean.myTeam),
-      safeCell_(clean.oppTeam),
+      textCell_(clean.nickname),
+      textCell_(clean.myTeam),
+      textCell_(clean.oppTeam),
       clean.goalsFor,
       clean.goalsAgainst,
-      clean.result,
-      clean.difficulty,
+      textCell_(clean.result),
+      textCell_(clean.difficulty),
       clean.score
     ]);
     SpreadsheetApp.flush();
+    recordRateLimit_(clean.nickname);
     return { ok: true, score: clean.score, result: clean.result };
   } catch (err) {
     console.error('saveMatchResult 실패: ' + ((err && err.stack) || err));
@@ -81,8 +91,9 @@ function saveMatchResult(record) {
  * @return {Array<Object>} JSON 직렬화 가능한 기록 배열 (Date 는 문자열로 변환)
  */
 function getLeaderboard(limit) {
-  var n = toInt_(limit, 1, 100);
-  if (n === null) n = 20;
+  // 범위를 벗어나면 1~100 으로 맞추고, 숫자가 아니면 기본값 20
+  var n = Math.floor(Number(limit));
+  n = isFinite(n) ? Math.min(100, Math.max(1, n)) : 20;
   var rows;
   try {
     rows = readAllRows_();
@@ -158,8 +169,12 @@ function sanitizeRecord_(r) {
   if (TEAM_NAMES_.indexOf(myTeam) < 0 || TEAM_NAMES_.indexOf(oppTeam) < 0) {
     throw new Error('알 수 없는 팀입니다.');
   }
-  var gf = toInt_(r.goalsFor, 0, GOALS_MAX_);
-  var ga = toInt_(r.goalsAgainst, 0, GOALS_MAX_);
+  if (myTeam === oppTeam) throw new Error('같은 팀끼리는 경기할 수 없습니다.');
+  var minutes = toInt_(r.minutes, 1, 60);
+  if (minutes === null || MINUTES_.indexOf(minutes) < 0) throw new Error('경기 시간 값이 올바르지 않습니다.');
+  var goalCap = Math.min(GOALS_MAX_, minutes * GOALS_PER_MIN_);
+  var gf = toInt_(r.goalsFor, 0, goalCap);
+  var ga = toInt_(r.goalsAgainst, 0, goalCap);
   if (gf === null || ga === null) throw new Error('득점/실점 값이 올바르지 않습니다.');
   var difficulty = cleanText_(r.difficulty, 5);
   if (!Object.prototype.hasOwnProperty.call(DIFFICULTY_MULT_, difficulty)) {
@@ -175,6 +190,7 @@ function sanitizeRecord_(r) {
     goalsFor: gf,
     goalsAgainst: ga,
     difficulty: difficulty,
+    minutes: minutes,
     result: result,
     score: computeScore_(gf, ga, difficulty)
   };
@@ -191,23 +207,85 @@ function cleanText_(v, max) {
   return s;
 }
 
-/** 스프레드시트 수식 주입 방지: = + - @ 로 시작하면 앞에 ' 를 붙입니다. */
-function safeCell_(s) {
-  s = String(s);
-  return /^[=+\-@]/.test(s) ? "'" + s : s;
+/**
+ * 글자 칸을 항상 '텍스트'로 저장합니다.
+ * 앞에 ' (따옴표 접두사)를 붙이면 시트는 값을 그대로 문자열로 보관하고, 읽을 때 ' 는 값에 포함되지 않습니다.
+ * - = + - @ 로 시작하는 수식 주입 방지
+ * - '007' → 7, '50%' → 0.5, 'TRUE' → true, '2024-01-01' → 날짜 처럼 자동 변환되는 것 방지
+ */
+function textCell_(s) {
+  return "'" + String(s);
 }
 
-/** 정수 변환 + 범위 확인. 실패 시 null */
+/**
+ * 엄격한 정수 검증. 진짜 정수(number) 또는 숫자로만 된 짧은 문자열('3')만 허용합니다.
+ * 2.9, true, [5], '0x1e', '1e1' 같은 값은 거부(null)합니다.
+ */
 function toInt_(v, min, max) {
-  if (v === null || v === undefined || v === '') return null;
-  var n = Number(v);
-  if (!isFinite(n)) return null;
-  n = Math.floor(n);
+  var n;
+  if (typeof v === 'number') n = v;
+  else if (typeof v === 'string' && /^\d{1,3}$/.test(v)) n = parseInt(v, 10);
+  else return null;
+  if (!isFinite(n) || Math.floor(n) !== n) return null;
   if (n < min || n > max) return null;
   return n;
 }
 
-/** 스프레드시트 찾기 (없으면 null). 컨테이너 바인딩 시트를 우선 사용합니다. */
+/**
+ * 저장 요청 제한 확인 (반드시 스크립트 잠금 안에서 호출). 제한에 걸리면 안내 문구, 아니면 null.
+ * - 전체: 1분에 RATE_GLOBAL_PER_MIN_ 건
+ * - 같은 닉네임: RATE_NICK_COOLDOWN_SEC_ 초에 1건
+ */
+function checkRateLimit_(nickname) {
+  try {
+    var cache = CacheService.getScriptCache();
+    if (!cache) return null;
+    var n = Number(cache.get(rateGlobalKey_())) || 0;
+    if (n >= RATE_GLOBAL_PER_MIN_) return '지금은 저장 요청이 너무 많습니다. 1분 뒤에 다시 시도해 주세요.';
+    if (cache.get(rateNickKey_(nickname))) return '같은 닉네임으로 방금 저장했습니다. 잠시 후 다시 시도해 주세요.';
+  } catch (e) {
+    console.warn('요청 제한 확인 실패(무시): ' + e);
+  }
+  return null;
+}
+
+/** 저장 성공 후 요청 제한 카운터 갱신 */
+function recordRateLimit_(nickname) {
+  try {
+    var cache = CacheService.getScriptCache();
+    var key = rateGlobalKey_();
+    var n = Number(cache.get(key)) || 0;
+    cache.put(key, String(n + 1), 120);
+    cache.put(rateNickKey_(nickname), '1', RATE_NICK_COOLDOWN_SEC_);
+  } catch (e) {
+    console.warn('요청 제한 기록 실패(무시): ' + e);
+  }
+}
+
+function rateGlobalKey_() {
+  return 'rate_g_' + Math.floor(Date.now() / 60000);
+}
+
+function rateNickKey_(nickname) {
+  return 'rate_n_' + encodeURIComponent(String(nickname));
+}
+
+/** 시트 셀 값을 문자열로 (시트가 날짜/숫자로 자동 변환한 값도 안전하게 처리) */
+function cellText_(v) {
+  if (v === null || v === undefined) return '';
+  if (Object.prototype.toString.call(v) === '[object Date]') {
+    return isNaN(v.getTime()) ? '' : Utilities.formatDate(v, TZ_, 'yyyy-MM-dd');
+  }
+  return String(v);
+}
+
+/**
+ * 스프레드시트 찾기. 컨테이너 바인딩 시트를 우선 사용합니다.
+ * - 바인딩 시트도, 저장된 ID 도 없으면 null (이때만 새로 만들어도 됩니다)
+ * - ID 가 저장되어 있는데 열리지 않으면 한 번 재시도 후 오류를 던집니다.
+ *   (일시적인 "Service timed out" 등으로 새 시트를 만들어 기존 기록과 연결이 끊기는 것을 막기 위함.
+ *    저장된 ID 는 절대 자동으로 덮어쓰지 않습니다.)
+ */
 function findSpreadsheet_() {
   var ss = null;
   try {
@@ -218,12 +296,18 @@ function findSpreadsheet_() {
   if (ss) return ss;
   var id = PropertiesService.getScriptProperties().getProperty(SS_PROP_KEY_);
   if (!id) return null;
-  try {
-    return SpreadsheetApp.openById(id);
-  } catch (e) {
-    console.warn('저장된 스프레드시트를 열 수 없습니다: ' + e);
-    return null;
+  var lastErr = null;
+  for (var attempt = 0; attempt < 2; attempt++) {
+    try {
+      return SpreadsheetApp.openById(id);
+    } catch (e) {
+      lastErr = e;
+      console.warn('저장된 스프레드시트를 열 수 없습니다 (시도 ' + (attempt + 1) + '/2): ' + e);
+      if (attempt === 0) Utilities.sleep(800);
+    }
   }
+  throw new Error('기록 스프레드시트(ID ' + id + ')를 열 수 없습니다: ' + ((lastErr && lastErr.message) || lastErr) +
+    ' / 시트를 삭제했다면 스크립트 속성 ' + SS_PROP_KEY_ + ' 를 지운 뒤 다시 시도하세요.');
 }
 
 /**
@@ -280,13 +364,13 @@ function readAllRows_() {
     rows.push({
       ts: isDate ? d.getTime() : 0,
       date: isDate ? Utilities.formatDate(d, TZ_, 'yyyy-MM-dd HH:mm') : String(d),
-      nickname: String(v[1]),
-      myTeam: String(v[2]),
-      oppTeam: String(v[3]),
+      nickname: cellText_(v[1]),
+      myTeam: cellText_(v[2]),
+      oppTeam: cellText_(v[3]),
       goalsFor: Number(v[4]) || 0,
       goalsAgainst: Number(v[5]) || 0,
-      result: String(v[6]),
-      difficulty: String(v[7]),
+      result: cellText_(v[6]),
+      difficulty: cellText_(v[7]),
       score: score
     });
   }
