@@ -78,11 +78,26 @@ input.txt#nick{padding:10px 14px}
 .seg{display:flex;gap:6px}
 .seg button{flex:1;min-height:48px;padding:11px 6px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:700 15px var(--body);cursor:pointer}
 .seg button.sel{background:var(--acc);color:#1c1917;border-color:var(--acc)}
+/* 난이도 6단계: 넓은 화면은 한 줄, 좁은 화면은 3칸 × 2줄 */
+.diff-h{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:12px;row-gap:2px}
+.diff-seg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.diff-seg button{min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 2px;white-space:nowrap;min-width:0}
+.diff-seg .dn{font-size:15px;line-height:1.1}
+/* 넓은 화면: 난이도 · 경기 시간 · 닉네임을 한 줄에 */
+@media (min-width:900px){
+  .setup-grid{display:grid;grid-template-columns:minmax(0,2.75fr) minmax(0,2fr);column-gap:14px;align-items:start}
+  .setup-grid .setup-row{flex-wrap:nowrap}.setup-grid .setup-row>*{flex:1 1 0;min-width:0}
+  .diff-seg{gap:5px} .diff-seg .dn{font-size:14px;letter-spacing:-.3px}}
+.pips{display:flex;gap:3px}.pips i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18)}
+.pips i.on{background:#4ade80}.diff-seg button.sel .pips i{background:rgba(28,25,23,.25)}.diff-seg button.sel .pips i.on{background:#1c1917}
+.diff-desc{font-size:13px;font-weight:700;color:#e2e8f0;letter-spacing:0}
+.diff-desc b{color:var(--acc);font-weight:800;margin-right:5px}.diff-desc .mul{color:var(--muted);font-weight:700;white-space:nowrap}
+@media (max-width:640px){.diff-seg{grid-template-columns:repeat(3,minmax(0,1fr))}}
 input.txt{width:100%;min-height:48px;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
   font:700 16px var(--body);outline:none;-webkit-user-select:text;user-select:text}
 input.txt:focus{border-color:var(--acc)}
 .vs{margin-top:12px;text-align:center;font-weight:800;font-size:16px;color:#e2e8f0}
-.vs b{color:var(--acc)}
+.vs b{color:var(--acc)}.vs .nw{white-space:nowrap}
 /* 도움말 */
 table.ctl{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
 table.ctl th,table.ctl td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -198,7 +213,7 @@ body.touch .icon-btn svg{width:26px;height:26px}
 /* 작은 화면: 설정(난이도·시간·닉네임)을 팀 목록보다 먼저, 팀 카드는 간단히 */
 @media (max-width:760px),(max-height:520px){
   #scr-setup .panel{display:flex;flex-direction:column}
-  #scr-setup .phead{order:-2} #scr-setup .setup-row{order:-1}
+  #scr-setup .phead{order:-2} #scr-setup .setup-grid{order:-1}
   .team-card{padding:7px 8px;gap:5px} .team-card .bar{display:none} .kit{width:24px;height:24px;border-width:3px}
   .stats{gap:4px}}
 /* 가로 휴대폰 등 낮은 화면: 모달·메뉴를 한 화면에 들어오게 */
@@ -209,7 +224,7 @@ body.touch .icon-btn svg{width:26px;height:26px}
   .kick-bar{margin:0 -16px -12px;padding:2px 16px 10px;border-radius:0 0 14px 14px}
   h2{font-size:21px} h3{margin:8px 0 5px}
   .btn{padding:9px 12px;font-size:15px;margin-top:7px;border-radius:11px} .btn.big{font-size:17px;padding:10px 12px}
-  .seg button{padding:8px 6px}
+  .seg button{padding:8px 6px} .diff-seg button{min-height:48px;gap:4px} .diff-desc{font-size:12.5px}
   .title-panel{padding:14px 18px 12px} .logo{font-size:42px} .ball-ico{width:42px;height:42px} .logo-sub{margin-bottom:8px} .foot{margin-top:8px}
   #halfStats,#resStats{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
   .statrow{margin:4px 0}
@@ -268,16 +283,19 @@ body.touch .icon-btn svg{width:26px;height:26px}
     <div class="teams" id="myTeams"></div>
     <h3>상대 팀</h3>
     <div class="teams" id="oppTeams"></div>
+    <div class="setup-grid">
+    <div class="diff-block">
+      <h3 class="diff-h"><span>난이도</span><span class="diff-desc" id="diffDesc" aria-live="polite"></span></h3>
+      <div class="seg diff-seg" id="segDiff" role="radiogroup" aria-label="난이도"></div>
+    </div>
     <div class="row setup-row">
-      <div><h3>난이도</h3>
-        <div class="seg" id="segDiff"><button data-v="쉬움">쉬움</button><button data-v="보통" class="sel">보통</button><button data-v="어려움">어려움</button></div>
-      </div>
       <div><h3>경기 시간 (실제 시간)</h3>
         <div class="seg" id="segTime"><button data-v="2">2분</button><button data-v="4" class="sel">4분</button><button data-v="6">6분</button></div>
       </div>
       <div><h3>닉네임</h3>
         <input class="txt" id="nick" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" spellcheck="false">
       </div>
+    </div>
     </div>
     <div class="kick-bar">
       <div class="vs" id="vsLine"></div>
@@ -473,18 +491,55 @@ var FORM = [
 ];
 var CORNER_SPOTS = [[0.93, 0.45], [0.90, 0.57], [0.87, 0.49], [0.84, 0.37], [0.84, 0.63], [0.64, 0.50]];
 
-// 난이도별 AI 파라미터 (CPU 팀에 적용)
+// 난이도별 AI 파라미터 (CPU 팀에 적용) · FIFA 방식 6단계
+//  speed 이동 속도 배율 · decision 공을 가진 뒤 판단 지연(초) · passNoise/shotNoise 패스·슛 방향 오차(라디안)
+//  tackle 태클·경합 · tackleCd 태클 재시도 간격 · gkReact/gkSave/gkPos 골키퍼 반응·선방·위치 선정
+//  pressers 압박 인원 · press 압박 강도(가까이 붙는 정도) · aggression 슬라이딩 빈도 · mark 대인 마크
+//  anticip 공 길목 예측 · passIQ 패스 선택 · shotRate/shotPow 슛 시도·세기 · dribble 드리블(탈압박)
+//  assist 패스 어시스트(받는 선수 예측·마중·퍼스트 터치) · work 활동량(질주·스태미나 사용)
+//  read 상대 패스 길목을 읽고 먼저 뛰어드는 확률 (월드클래스 이상)
 var DIFFS = {
-  '쉬움':   { speed: 0.88, decision: 0.50, passNoise: 0.11, shotNoise: 0.15, tackle: 0.75, gkReact: 0.20, gkSave: 0.55, pressers: 1, tackleCd: 1.05, aggression: 0.5 },
-  '보통':   { speed: 0.97, decision: 0.32, passNoise: 0.06, shotNoise: 0.095, tackle: 1.0, gkReact: 0.16, gkSave: 0.65, pressers: 1, tackleCd: 0.8, aggression: 0.8 },
-  '어려움': { speed: 1.05, decision: 0.20, passNoise: 0.035, shotNoise: 0.06, tackle: 1.22, gkReact: 0.12, gkSave: 0.75, pressers: 2, tackleCd: 0.6, aggression: 1.0 }
+  '입문':     { speed: 0.80, decision: 0.66, passNoise: 0.17,  shotNoise: 0.21,  tackle: 0.58, tackleCd: 1.45, gkReact: 0.27, gkSave: 0.44, gkPos: 0.45,
+                pressers: 1, press: 0.2,  aggression: 0.15, mark: 0.25, anticip: 0.3,  passIQ: 0.25, shotRate: 0.5,  shotPow: 0.8,  dribble: 0.55, assist: 0.15, work: 0.25 },
+  '아마추어': { speed: 0.87, decision: 0.54, passNoise: 0.12,  shotNoise: 0.155, tackle: 0.76, tackleCd: 1.12, gkReact: 0.22, gkSave: 0.53, gkPos: 0.65,
+                pressers: 1, press: 0.45, aggression: 0.4,  mark: 0.5,  anticip: 0.55, passIQ: 0.5,  shotRate: 0.65, shotPow: 0.9,  dribble: 0.75, assist: 0.4,  work: 0.5 },
+  '세미프로': { speed: 0.92, decision: 0.41, passNoise: 0.09,  shotNoise: 0.12,  tackle: 0.89, tackleCd: 0.94, gkReact: 0.185, gkSave: 0.59, gkPos: 0.82,
+                pressers: 1, press: 0.7,  aggression: 0.6,  mark: 0.75, anticip: 0.75, passIQ: 0.75, shotRate: 0.85, shotPow: 0.95, dribble: 0.9,  assist: 0.6,  work: 0.75 },
+  '프로':     { speed: 0.97, decision: 0.32, passNoise: 0.06,  shotNoise: 0.095, tackle: 1.0,  tackleCd: 0.8,  gkReact: 0.16, gkSave: 0.65, gkPos: 1,
+                pressers: 1, press: 1,    aggression: 0.8,  mark: 0.92, anticip: 0.92, passIQ: 0.92, shotRate: 1,    shotPow: 1,    dribble: 1,    assist: 0.9,  work: 0.9 },
+  '월드클래스': { speed: 1.02, decision: 0.24, passNoise: 0.042, shotNoise: 0.07, tackle: 1.14, tackleCd: 0.67, gkReact: 0.135, gkSave: 0.71, gkPos: 1.05,
+                pressers: 2, press: 1,    aggression: 1.0,  mark: 1,    anticip: 1,    passIQ: 1,    shotRate: 1.05, shotPow: 1.02, dribble: 1.1,  assist: 1,    work: 1,    read: 0.3 },
+  '레전드':   { speed: 1.07, decision: 0.15, passNoise: 0.026, shotNoise: 0.047, tackle: 1.3,  tackleCd: 0.52, gkReact: 0.105, gkSave: 0.79, gkPos: 1.1,
+                pressers: 2, press: 1.1,  aggression: 1.1,  mark: 1.15, anticip: 1.05, passIQ: 1.15, shotRate: 1.1,  shotPow: 1.04, dribble: 1.2,  assist: 1,    work: 1.1,  read: 0.9 }
+};
+var DIFF_ORDER = ['입문', '아마추어', '세미프로', '프로', '월드클래스', '레전드'];
+var DIFF_DEFAULT = '세미프로';
+var DIFF_DESC = {
+  '입문': '처음 해보는 친구에게 추천',
+  '아마추어': '조작이 조금 익숙해졌다면',
+  '세미프로': '처음이 아니라면 여기서 시작',
+  '프로': '제대로 겨루는 한판 승부',
+  '월드클래스': '빠른 압박 · 정확한 패스',
+  '레전드': '최강 AI · 한 골도 쉽지 않아요'
 };
 var GK_SHUFFLE = 0.55; // 반응 시간 동안 골키퍼 옆걸음 속도 비율
 var PARRY_WIDE = 0.4;  // 쳐낸 공이 골대 옆(코너킥)으로 나가는 비율
-// 사람 팀의 AI 동료
-var ALLY_AI = { speed: 1.0, decision: 0.3, passNoise: 0.05, shotNoise: 0.08, tackle: 1.0, gkReact: 0.15, gkSave: 0.68, pressers: 1, tackleCd: 0.75, aggression: 0.7 };
-var DEMO_AI = { speed: 0.97, decision: 0.3, passNoise: 0.06, shotNoise: 0.09, tackle: 1.0, gkReact: 0.16, gkSave: 0.66, pressers: 1, tackleCd: 0.8, aggression: 0.7 };
-var DIFF_MULT = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
+// 사람 팀의 AI 동료 (난이도와 무관하게 고정)
+var ALLY_AI = aiProfile({ speed: 1.0, decision: 0.3, passNoise: 0.05, shotNoise: 0.08, tackle: 1.0, gkReact: 0.15, gkSave: 0.68, pressers: 1, tackleCd: 0.75, aggression: 0.7 });
+var DEMO_AI = aiProfile({ speed: 0.97, decision: 0.3, passNoise: 0.06, shotNoise: 0.09, tackle: 1.0, gkReact: 0.16, gkSave: 0.66, pressers: 1, tackleCd: 0.8, aggression: 0.7 });
+// 빠진 항목은 기본값(1 = 기존 동작)으로 채웁니다.
+function aiProfile(o) {
+  var d = { press: 1, mark: 1, anticip: 1, passIQ: 1, shotRate: 1, shotPow: 1, dribble: 1, assist: 1, work: 1, gkPos: 1, read: 0 };
+  for (var k in d) if (o[k] === undefined) o[k] = d[k];
+  return o;
+}
+for (var dk in DIFFS) aiProfile(DIFFS[dk]);
+// 랭킹 점수 배율 (예전 기록 쉬움/보통/어려움 도 계속 표시·계산할 수 있도록 남겨 둡니다)
+var DIFF_MULT = { '입문': 0.6, '아마추어': 0.9, '세미프로': 1.2, '프로': 1.5, '월드클래스': 2, '레전드': 2.5, '쉬움': 1, '보통': 1.5, '어려움': 2 };
+// 예전 3단계 이름 → 새 이름 (예전 설정·테스트 호출 호환)
+var DIFF_LEGACY = { '쉬움': '아마추어', '보통': '프로', '어려움': '월드클래스' };
+function isDiff(v) { return DIFF_ORDER.indexOf(v) >= 0; }
+function normDiff(v) { v = String(v || ''); if (isDiff(v)) return v; return DIFF_LEGACY[v] || DIFF_DEFAULT; }
 
 function computeScore(gf, ga, diff) {
   var base = gf > ga ? 300 : (gf === ga ? 100 : 0);
@@ -934,7 +989,7 @@ function makeTeam(def, side, human, ai, kit) {
   return {
     def: def, side: side, human: human, ai: ai, kit: kit, dir: side === 0 ? 1 : -1, players: [], score: 0, opp: null,
     stats: { shots: 0, onTarget: 0, passes: 0, passOk: 0, poss: 0, tackles: 0 },
-    chaser: null, pr1: null, pr2: null
+    chaser: null, pr1: null, pr2: null, icp: null, readKick: -1, readOk: false
   };
 }
 function makePlayer(team, f, i) {
@@ -945,7 +1000,8 @@ function makePlayer(team, f, i) {
     desX: 0, desY: 0, desSprint: false,
     kickCd: 0, tackleCd: 0, stun: 0, slideT: 0, slideCd: 0, slideHit: false, sdx: 0, sdy: 0,
     diveT: 0, diveCd: 0, holding: false, holdT: 0, gkMiss: 0, react: 0, touchCd: 0, headerCd: 0, lungeT: 0,
-    decT: 0, charge: 0, passCharge: 0, feintT: 0, feintCd: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6
+    decT: 0, charge: 0, passCharge: 0, feintT: 0, feintCd: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6,
+    missT: 0, recvSmart: true, icpX: 0, icpY: 0
   };
 }
 // 두 유니폼이 얼마나 잘 구분되는지 (셔츠 색 차이 + 밝기 차이 + 테두리 차이)
@@ -1177,7 +1233,8 @@ function interceptPoint(p, out) {
     ballPosAt(t, out);
     t = Math.min(2, dist(p.x, p.y, out.x, out.y) / (p.speed * 1.25));
   }
-  ballPosAt(t, out);
+  // 예측력(anticip)이 낮은 AI 는 공이 갈 곳보다 지금 공이 있는 곳 쪽을 쫓아 한 박자 늦습니다.
+  ballPosAt(t * clamp(p.team.ai.anticip, 0.2, 1.1), out);
   out.x = clamp(out.x, -20, PW + 20); out.y = clamp(out.y, -20, PH + 20);
 }
 function steerTo(p, tx, ty, sprint, slowR) {
@@ -1377,9 +1434,12 @@ function passTo(p, r, kind, noise, power) {
   var t = p.team, sx = ball.x, sy = ball.y;
   var tx = r.x, ty = r.y, d, v, vz = 0, i, T = 0.6;
   // 받는 선수가 움직이고 있으면 공이 도착할 때쯤 있을 곳을 겨냥합니다 (받는 선수도 공 쪽으로 마중 나옴)
-  var lead = r.role === 'GK' ? 0 : 0.55;
+  // (AI 는 난이도의 패스 어시스트(assist)만큼만 받는 선수의 움직임과 공간을 계산합니다. 사람 팀은 항상 1)
+  var asst = t.ai.assist;
+  var lead = r.role === 'GK' ? 0 : 0.55 * (0.3 + 0.7 * Math.min(1, asst));
   var plannedV = 0;
-  if ((kind === 'through' || kind === 'lobthrough') && planThrough(p, r, kind === 'lobthrough')) {
+  r.recvSmart = Math.random() < asst + 0.1;
+  if ((kind === 'through' || kind === 'lobthrough') && Math.random() < asst + 0.1 && planThrough(p, r, kind === 'lobthrough')) {
     tx = PP.x; ty = PP.y; plannedV = PP.v; vz = PP.vz; T = PP.t;
   } else {
     if (kind === 'through' || kind === 'lobthrough') { runDir(r, RD); tx += RD.x * 100; ty += RD.y * 100; }
@@ -1499,7 +1559,8 @@ function setCtrl(p) {
 }
 function tryTackle(d, c, bonus) {
   if (c.holding || c.feintT > 0) return false; // 개인기(탈압박) 중에는 태클이 통하지 않습니다
-  var pr = 0.2 + bonus + (d.team.def.def - c.team.def.att) / 180 + (d.team.ai.tackle - 1) * 0.2;
+  // 수비 AI 의 태클 능력(tackle)과 공 가진 쪽 AI 의 드리블(탈압박, dribble)을 함께 반영 (사람 팀은 모두 1)
+  var pr = 0.2 + bonus + (d.team.def.def - c.team.def.att) / 180 + (d.team.ai.tackle - 1) * 0.2 - (c.team.ai.dribble - 1) * 0.15;
   if (c.desSprint) pr += 0.07;
   // 가만히 서서 공을 끄는 선수는 뺏기기 쉽습니다
   var cs = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
@@ -1853,7 +1914,7 @@ function humanStep(dt) {
 function teamPrecompute() {
   for (var s = 0; s < 2; s++) {
     var t = G.teams[s], i, p, d;
-    t.chaser = null; t.pr1 = null; t.pr2 = null;
+    t.chaser = null; t.pr1 = null; t.pr2 = null; t.icp = null;
     var hc = (G.human && G.human.team === t) ? G.human.ctrl : null;
     var hd = hc ? dist(hc.x, hc.y, ball.x, ball.y) : 1e9;
     if (!ball.owner) {
@@ -1864,6 +1925,16 @@ function teamPrecompute() {
         if (d < bt) { bt = d; t.chaser = p; }
       }
       if (hc && t.chaser && dist(t.chaser.x, t.chaser.y, ball.x, ball.y) > hd * 0.85 && hd < 260) t.chaser = null;
+      // 상대 패스에 대한 반응: 낮은 난이도 CPU 는 패스가 나간 뒤 잠깐 멍하니 있다가 반응합니다.
+      var oppPass = ball.pendingPass === t.opp;
+      if (!hc && oppPass && G.time - ball.kickTime < Math.max(0, (t.ai.decision - 0.3) * 0.9)) t.chaser = null;
+      // 높은 난이도 CPU 는 패스 길목을 읽고, 공보다 먼저 닿을 수 있는 선수가 길목으로 뛰어듭니다 (실제 속도 기준, 순간이동 없음).
+      t.icp = null;
+      if (!hc && oppPass && t.ai.read > 0 && G.phase === 'play') {
+        // 패스가 나갈 때마다 '패스를 읽었는지'를 한 번 정합니다 (read 확률)
+        if (t.readKick !== ball.kickTime) { t.readKick = ball.kickTime; t.readOk = Math.random() < t.ai.read; }
+        if (t.readOk) findInterceptor(t);
+      }
       // 우리 편 패스가 날아가는 중: 받기로 한 선수만 공을 맞이하러 가고, 다른 동료는 따라붙지 않습니다.
       // (패스가 크게 빗나가 받는 선수보다 훨씬 먼저 닿을 동료가 있을 때만 그 동료도 쫓아갑니다)
       var pt = ball.passTarget;
@@ -1874,6 +1945,8 @@ function teamPrecompute() {
       }
     } else if (ball.owner.team !== t && !ball.owner.holding) {
       var n = t.ai.pressers;
+      // 압박 강도가 낮은 AI 는 상대 진영 깊숙한 곳의 공은 쫓아가 압박하지 않습니다.
+      if (t.ai.press < 1 && fwdN(t, ball.x) > 0.5 + t.ai.press * 0.6) n = 0;
       if (hc) n = hd > 130 ? 1 : 0;
       // C 누르고 있기: 동료 한 명이 더 압박에 가담
       if (hc && G.human.teamPress) n = hd > 130 ? 2 : 1;
@@ -1887,6 +1960,21 @@ function teamPrecompute() {
         }
         if (n < 2) t.pr2 = null;
       }
+    }
+  }
+}
+function findInterceptor(t) {
+  buildTraj();
+  var margin = 0.34 - 0.1 * t.ai.read, n = TRJ.n;
+  for (var i = 2; i < n; i += 2) {
+    if (TRJ.z[i] > CHEST_Z) continue;
+    var x = TRJ.x[i], y = TRJ.y[i], tb = TRJ.t[i];
+    if (tb > 1.4) break;
+    if (x < 0 || x > PW || y < 0 || y > PH) break;
+    for (var k = 1; k < t.players.length; k++) {
+      var p = t.players[k];
+      if (p === t.chaser || p.stun > 0 || p.slideT > 0) continue;
+      if (runTime(p, x, y, true) + margin < tb) { t.icp = p; p.icpX = x; p.icpY = y; return; }
     }
   }
 }
@@ -1915,9 +2003,10 @@ function supportTarget(p, c, out) {
   out.x = clamp(out.x, 30, PW - 30); out.y = clamp(out.y, 30, PH - 30);
 }
 function defendTarget(p, c, out) {
-  var t = p.team, o = t.opp.players;
+  var t = p.team, o = t.opp.players, mk = t.ai.mark;
   formationTarget(p, -1, out);
-  var best = null, bd = 150;
+  // 대인 마크(mark): 낮으면 가까운 상대만 느슨하게, 높으면 더 넓은 범위의 상대를 바짝 따라붙습니다.
+  var best = null, bd = 80 + 70 * Math.min(mk, 1.2);
   for (var i = 1; i < o.length; i++) {
     var q = o[i]; if (q === c) continue;
     var d = dist(q.x, q.y, out.x, out.y);
@@ -1925,7 +2014,8 @@ function defendTarget(p, c, out) {
   }
   if (best) {
     var gx = ownGoalX(t), dx = gx - best.x, dy = CY - best.y, l = Math.sqrt(dx * dx + dy * dy) || 1;
-    out.x = lerp(out.x, best.x + dx / l * 28, 0.65); out.y = lerp(out.y, best.y + dy / l * 28, 0.65);
+    var w = clamp(0.65 * mk, 0.1, 0.8), off = 28 - Math.max(0, mk - 1) * 30;
+    out.x = lerp(out.x, best.x + dx / l * off, w); out.y = lerp(out.y, best.y + dy / l * off, w);
   }
 }
 function aheadSpace(p) {
@@ -1939,7 +2029,9 @@ function aheadSpace(p) {
   return clamp((md - 30) / 170, 0, 1);
 }
 function bestPassOption(p) {
-  var t = p.team, gx = oppGoalX(t);
+  var t = p.team, gx = oppGoalX(t), iq = t.ai.passIQ;
+  // 패스 선택 능력(passIQ): 낮으면 패스 길·빈 공간을 덜 따지고 판단에 잡음이 섞입니다(막힌 길로 차거나 좋은 기회를 놓침).
+  var fuzz = Math.max(0, 1 - iq) * 1.3, laneW = 0.9 * clamp(iq, 0.35, 1.2), openW = 0.8 * clamp(iq, 0.5, 1.2);
   BP.r = null; BP.score = -1e9; BP.kind = 'ground';
   for (var i = 0; i < t.players.length; i++) {
     var r = t.players[i]; if (r === p) continue;
@@ -1948,11 +2040,13 @@ function bestPassOption(p) {
     var open = clamp(nearestOppDistXY(t, r.x, r.y) / 140, 0, 1);
     var laneS = clamp((laneClear(t, p.x, p.y, r.x, r.y) - 10) / 45, 0, 1);
     var kind = 'ground';
-    if (laneS < 0.45 && d > 200) { kind = 'lob'; laneS = 0.7; }
-    var s = 1.0 + adv + open * 0.8 + laneS * 0.9 - d / 1500;
+    if (laneS < 0.45 && d > 200 && Math.random() < 0.25 + 0.75 * iq) { kind = 'lob'; laneS = 0.7; }
+    var s = 1.0 + adv + open * openW + laneS * laneW - d / 1500 + (fuzz ? rand(-fuzz, fuzz) : 0);
+    // 월드클래스 이상: 받는 선수 발밑까지 상대가 먼저 닿을 수 있는 길은 더 피합니다.
+    if (iq > 1 && kind === 'ground' && laneS < 0.3) s -= (iq - 1) * 3;
     if (r.role === 'GK') s -= 1.4;
     if (dist(r.x, r.y, gx, CY) < 380) s += 0.3;
-    if (r.role !== 'GK' && adv > 0.1 && kind === 'ground') {
+    if (r.role !== 'GK' && adv > 0.1 && kind === 'ground' && Math.random() < 0.3 + 0.7 * iq) {
       var sx = r.x + t.dir * 120;
       if (sx > 40 && sx < PW - 40 && nearestOppDistXY(t, sx, r.y) > 90 && laneClear(t, p.x, p.y, sx, r.y) > 30) { s += 0.35; kind = 'through'; }
     }
@@ -1964,7 +2058,7 @@ function aiShoot(p, dG, press) {
   var t = p.team, gk = t.opp.players[0];
   var side = gk.y > CY ? -1 : 1; if (Math.random() < 0.3) side = -side;
   var aim = CY + side * (GOAL_HALF - rand(12, 34));
-  var power = clamp(0.5 + (dG - 200) / 900 + rand(-0.08, 0.12), 0.45, 0.85);
+  var power = clamp((0.5 + (dG - 200) / 900 + rand(-0.08, 0.12)) * t.ai.shotPow, 0.35, 0.88);
   var noise = t.ai.shotNoise * (1 + (press < 30 ? 0.4 : 0) + dG / 900);
   shoot(p, power, aim, noise);
 }
@@ -1984,6 +2078,7 @@ function aiCarrier(p, dt) {
     if (dG < 500 && adx > 30 && ady < adx * 1.8 + 40) {
       var sp = dG < 230 ? 0.85 : dG < 330 ? 0.5 : dG < 420 ? 0.16 : 0.05;
       if (laneClear(t, p.x, p.y, gx, CY) < 18) sp *= 0.5;
+      sp = Math.min(0.95, sp * ai.shotRate);
       if (Math.random() < sp) { aiShoot(p, dG, press); return; }
     }
     var bp = bestPassOption(p);
@@ -2003,23 +2098,27 @@ function aiCarrier(p, dt) {
     var side = (qx * -dy + qy * dx) > 0 ? -1 : 1;
     ax += -dy * side * w - qx / qd * w * 0.4; ay += dx * side * w - qy / qd * w * 0.4;
   }
-  var fx = dx + ax * 1.3, fy = dy + ay * 1.3;
+  var fx = dx + ax * 1.3 * ai.dribble, fy = dy + ay * 1.3 * ai.dribble;
   if (p.y < 55) fy += (55 - p.y) / 25; if (p.y > PH - 55) fy -= (p.y - (PH - 55)) / 25;
   if (p.x < 35) fx += 1; if (p.x > PW - 35) fx -= 1;
   var fl = Math.sqrt(fx * fx + fy * fy) || 1;
   p.desX = fx / fl; p.desY = fy / fl;
-  p.desSprint = press > 55 && p.stamina > 0.35 && space > 0.5;
+  p.desSprint = press > 55 && space > 0.5 && sprintOK(p, 0.35);
 }
+// 활동량(work): 낮은 난이도의 AI 는 질주를 아끼고(늦게 뛰고), 높은 난이도는 필요할 때 끝까지 뜁니다.
+function sprintOK(p, need) { return p.stamina > clamp(need + (1 - p.team.ai.work) * 0.3, 0.05, 0.9); }
 function aiField(p, dt) {
-  var t = p.team, own = ball.owner, d;
+  var t = p.team, own = ball.owner, d, ai = t.ai;
   p.runT -= dt;
   if (p.runT <= 0) { p.runT = rand(1.5, 3.5); p.runX = rand(-40, 40); p.runY = rand(-55, 55); }
   if (!own) {
-    if (ball.passTarget === p && ball.pendingPass === t) { runToReceive(p, false); return; }
+    // 패스 어시스트: 받는 선수가 공 궤적의 도착 지점으로 마중 (난이도가 낮으면 가끔 그냥 공을 쫓아가 늦게 받음)
+    if (ball.passTarget === p && ball.pendingPass === t && p.recvSmart !== false) { runToReceive(p, false); return; }
+    if (p === t.icp) { steerTo(p, p.icpX, p.icpY, sprintOK(p, 0.1), 6); return; }
     if (ball.passTarget === p || p === t.chaser) {
       interceptPoint(p, TMP);
       d = dist(p.x, p.y, TMP.x, TMP.y);
-      steerTo(p, TMP.x, TMP.y, d > 50 && p.stamina > 0.2, 8);
+      steerTo(p, TMP.x, TMP.y, d > 50 + (1 - Math.min(1, ai.work)) * 90 && sprintOK(p, 0.2), 8);
       return;
     }
     formationTarget(p, ball.lastTeam === t ? 0.5 : -0.3, TMP);
@@ -2029,23 +2128,32 @@ function aiField(p, dt) {
   if (own.team === t) {
     supportTarget(p, own, TMP);
     d = dist(p.x, p.y, TMP.x, TMP.y);
-    steerTo(p, TMP.x, TMP.y, d > 140 && p.stamina > 0.45, 40);
+    steerTo(p, TMP.x, TMP.y, d > 140 && sprintOK(p, 0.45), 40);
     return;
   }
   if ((p === t.pr1 || p === t.pr2) && !own.holding) {
-    var gx = ownGoalX(t), tx = own.x + own.vx * 0.2, ty = own.y + own.vy * 0.2;
+    var gx = ownGoalX(t), lk = 0.2 * clamp(ai.anticip, 0.2, 1.1), tx = own.x + own.vx * lk, ty = own.y + own.vy * lk;
     var gdx = gx - own.x, gdy = CY - own.y, gl = Math.sqrt(gdx * gdx + gdy * gdy) || 1;
     var dd = dist(p.x, p.y, own.x, own.y);
+    // 두 번째 압박 선수(월드클래스 이상): 공 가진 선수 가까이의 패스 받을 상대 쪽 길목을 막습니다.
+    if (p === t.pr2 && ai.press > 1) {
+      var mate = null, md = 260, o2 = own.team.players;
+      for (var j = 1; j < o2.length; j++) { var q2 = o2[j]; if (q2 === own) continue; var dq = dist(q2.x, q2.y, own.x, own.y); if (dq < md) { md = dq; mate = q2; } }
+      if (mate) { steerTo(p, lerp(own.x, mate.x, 0.45), lerp(own.y, mate.y, 0.45), sprintOK(p, 0.3), 6); return; }
+    }
     if (dd > 45) { tx += gdx / gl * 22; ty += gdy / gl * 22; } else { tx = ball.x; ty = ball.y; }
-    steerTo(p, tx, ty, dd > 70 && p.stamina > 0.25, 4);
-    if (dd < 42 && p.slideCd <= 0 && p.tackleCd <= 0 && !inOwnBox(t, own.x, own.y) && Math.random() < 0.006 * t.ai.aggression) {
+    // 압박 강도(press): 낮으면 느슨하게(천천히, 질주 없이 가까이서만) 따라붙습니다.
+    var pi = Math.min(1, ai.press);
+    steerTo(p, tx, ty, dd > 70 + (1 - pi) * 200 && sprintOK(p, 0.25), 4);
+    if (pi < 1) { var ps = 0.55 + 0.45 * pi; p.desX *= ps; p.desY *= ps; }
+    if (dd < 42 && p.slideCd <= 0 && p.tackleCd <= 0 && !inOwnBox(t, own.x, own.y) && Math.random() < 0.006 * ai.aggression) {
       startSlide(p, ball.x - p.x, ball.y - p.y);
     }
     return;
   }
   defendTarget(p, own, TMP);
   d = dist(p.x, p.y, TMP.x, TMP.y);
-  steerTo(p, TMP.x, TMP.y, d > 160 && p.stamina > 0.4, 40);
+  steerTo(p, TMP.x, TMP.y, d > 160 && sprintOK(p, 0.4), 40);
 }
 function aiGKWithBall(p, dt) {
   var t = p.team, bp, d;
@@ -2077,13 +2185,14 @@ function aiGK(p, dt) {
       var dy = TMP2.y - p.y;
       if (p.react >= t.ai.gkReact) {
         if (Math.abs(dy) > 16 && TMP2.t < 0.55 && p.diveCd <= 0) {
-          var ds = clamp(Math.abs(dy) / Math.max(TMP2.t, 0.12), 150, 400);
+          var ds = clamp(Math.abs(dy) / Math.max(TMP2.t, 0.12), 150, 400 * clamp(0.8 + 0.2 * t.ai.gkPos, 0.85, 1.03));
           G.dbg.dives++;
           p.diveT = 0.5; p.diveCd = 1.0; p.vx = 0; p.vy = (dy > 0 ? 1 : -1) * ds; p.sdx = 0; p.sdy = dy > 0 ? 1 : -1;
         } else steerTo(p, p.x, TMP2.y, true, 6);
       } else {
         // 반응 시간 동안에도 멈춰 서지 않고 공 쪽으로 천천히 옆걸음 (다이빙만 반응 시간 뒤에 가능)
-        steerTo(p, p.x, TMP2.y, false, 6); p.desX *= GK_SHUFFLE; p.desY *= GK_SHUFFLE;
+        var sh = GK_SHUFFLE * clamp(t.ai.gkPos, 0.4, 1.1);
+        steerTo(p, p.x, TMP2.y, false, 6); p.desX *= sh; p.desY *= sh;
       }
       return;
     }
@@ -2102,7 +2211,8 @@ function aiGK(p, dt) {
   }
   var dBall = dist(gx, CY, b.x, b.y);
   var depth = 14 + clamp(dBall * 0.06, 0, 55);
-  var ty = CY + clamp((b.y - CY) * 0.32, -(GOAL_HALF - 10), GOAL_HALF - 10);
+  // 위치 선정(gkPos): 낮으면 공 쪽 각도를 덜 좁혀 골대 가운데에 머뭅니다.
+  var ty = CY + clamp((b.y - CY) * 0.32 * clamp(t.ai.gkPos, 0.3, 1.1), -(GOAL_HALF - 10), GOAL_HALF - 10);
   steerTo(p, gx + dir * depth, ty, false, 30);
 }
 function setpieceMove(p) {
@@ -2158,6 +2268,7 @@ function movePlayer(p, dt) {
   if (p.receiveT > 0) p.receiveT -= dt;
   if (p.feintT > 0) p.feintT -= dt;
   if (p.feintCd > 0) p.feintCd -= dt;
+  if (p.missT > 0) p.missT -= dt;
   var spd;
   if (p.slideT > 0) {
     p.slideT -= dt;
@@ -2337,18 +2448,19 @@ function checkBallContacts() {
   var best = null, bestD = 1e18, head = null, i, p;
   for (i = 0; i < G.players.length; i++) {
     p = G.players[i];
-    if (p.stun > 0) continue;
+    if (p.stun > 0 || p.missT > 0) continue;
     if (p === b.kicker && G.time - b.kickTime < 0.28) continue;
     var gk = p.role === 'GK' && inOwnBox(p.team, b.x, b.y);
     // 패스를 받기로 한 선수는 공을 맞이할 준비가 되어 있어 조금 더 넓게 · 조금 더 높은 공까지 받아 냅니다.
-    var mine = !gk && p === b.passTarget && b.pendingPass === p.team;
-    var reach = PR + BR + 3 + (gk ? (p.diveT > 0 ? 16 : 9) : 0) + (p.slideT > 0 ? 5 : 0) + (mine ? 6 : 0);
+    // (AI 는 난이도의 패스 어시스트(assist) 비율만큼만 이 보정을 받습니다. 사람 팀은 항상 전부)
+    var mine = !gk && p === b.passTarget && b.pendingPass === p.team, ma = mine ? Math.min(1, p.team.ai.assist) : 0;
+    var reach = PR + BR + 3 + (gk ? (p.diveT > 0 ? 16 : 9) : 0) + (p.slideT > 0 ? 5 : 0) + 6 * ma;
     var dx = b.x - p.x, dy = b.y - p.y, d2 = dx * dx + dy * dy;
     if (d2 > (reach + 4) * (reach + 4)) continue;
     // 우리 팀 로빙/크로스를 받는 선수는 (슈팅 지역이 아니면) 헤딩으로 걷어내지 않고 가슴·발로 받아 둡니다.
     var recv = !gk && (p === b.passTarget || (b.pendingPass && b.pendingPass === p.team));
     // (크로스가 아닌 로빙은 받는 선수가 내려오는 공을 가슴·머리로 떨궈 받아 냅니다)
-    if (b.z > (gk ? 60 : (recv ? CHEST_Z + (mine && b.vz <= 0 ? (b.passKind === 'cross' ? 4 : 14) : 0) : 16))) {
+    if (b.z > (gk ? 60 : (recv ? CHEST_Z + (mine && b.vz <= 0 ? (b.passKind === 'cross' ? 4 : 14) * ma : 0) : 16))) {
       if (!gk && b.z < 46 && p.headerCd <= 0 && p.slideT <= 0 && !head && (!recv || headerShotZone(p))) head = p;
       continue;
     }
@@ -2363,8 +2475,13 @@ function checkBallContacts() {
     return;
   }
   var rs = dist(0, 0, b.vx - p.vx, b.vy - p.vy);
-  var mineP = p === b.passTarget && b.pendingPass === p.team;
-  if (rs > PICKUP_MAX + (mineP ? 180 : 0)) { if (p.touchCd <= 0) deflect(p); return; }
+  // 상대 패스 가로채기: 예측력(anticip)이 낮은 CPU 수비는 빠르게 지나가는 패스에 발을 헛디뎌 놓치기도 합니다. (사람 팀은 해당 없음)
+  if (b.pendingPass && b.pendingPass !== p.team && !(G.human && G.human.team === p.team)) {
+    var wh = clamp((0.95 - p.team.ai.anticip) * 0.6, 0, 0.36) * clamp(rs / 380, 0.4, 1.2);
+    if (wh > 0 && Math.random() < wh) { p.missT = 0.3; return; }
+  }
+  var mineP = p === b.passTarget && b.pendingPass === p.team ? Math.min(1, p.team.ai.assist) : 0;
+  if (rs > PICKUP_MAX + 180 * mineP) { if (p.touchCd <= 0) deflect(p); return; }
   // 양 팀 경합
   var o = p.team.opp.players, rival = null;
   for (i = 0; i < o.length; i++) {
@@ -2374,7 +2491,7 @@ function checkBallContacts() {
   }
   var winner = p;
   if (rival) {
-    var sa = (p.team.def.def + p.team.def.spd) * p.team.ai.tackle + rand(0, 70) + (mineP ? 25 : 0);
+    var sa = (p.team.def.def + p.team.def.spd) * p.team.ai.tackle + rand(0, 70) + 25 * mineP;
     var sb = (rival.team.def.def + rival.team.def.spd) * rival.team.ai.tackle + rand(0, 70);
     if (sb > sa) winner = rival;
   }
@@ -2955,7 +3072,17 @@ function goBack() {
   goScreen(tgt === 'help' || tgt === 'rank' ? 'title' : tgt);
 }
 
-var setup = { my: 0, opp: 1, diff: '보통', min: 4 };
+var setup = { my: 0, opp: 1, diff: normDiff(lsGet('seongmoSoccer.diff', DIFF_DEFAULT)), min: 4 };
+function diffButton(name, lv) {
+  var b = el('button');
+  b.type = 'button'; b.setAttribute('data-v', name); b.setAttribute('role', 'radio');
+  b.title = name + ' · ' + DIFF_DESC[name];
+  b.appendChild(el('span', 'dn', name));
+  var pp = el('span', 'pips');
+  for (var k = 0; k < DIFF_ORDER.length; k++) pp.appendChild(el('i', k <= lv ? 'on' : ''));
+  b.appendChild(pp);
+  return b;
+}
 function teamCard(i, which) {
   var t = TEAMS[i], b = el('button', 'team-card');
   b.type = 'button';
@@ -2986,6 +3113,7 @@ function renderSetup() {
   var my = $('myTeams'), op = $('oppTeams'), i;
   if (!setupBuilt) {
     for (i = 0; i < TEAMS.length; i++) { my.appendChild(teamCard(i, 'my')); op.appendChild(teamCard(i, 'opp')); }
+    for (i = 0; i < DIFF_ORDER.length; i++) $('segDiff').appendChild(diffButton(DIFF_ORDER[i], i));
     setupBuilt = true;
     $('nick').value = lsGet('seongmoSoccer.nick', '');
   }
@@ -3000,12 +3128,20 @@ function renderSetup() {
   var segs = [['segDiff', setup.diff], ['segTime', String(setup.min)]];
   for (var s = 0; s < segs.length; s++) {
     var bs = $(segs[s][0]).children;
-    for (i = 0; i < bs.length; i++) bs[i].classList.toggle('sel', bs[i].getAttribute('data-v') === segs[s][1]);
+    for (i = 0; i < bs.length; i++) {
+      var on = bs[i].getAttribute('data-v') === segs[s][1];
+      bs[i].classList.toggle('sel', on);
+      if (s === 0) bs[i].setAttribute('aria-checked', on ? 'true' : 'false');
+    }
   }
+  var dd = $('diffDesc'); dd.textContent = '';
+  dd.appendChild(el('b', '', setup.diff));
+  dd.appendChild(document.createTextNode(DIFF_DESC[setup.diff] + ' '));
+  dd.appendChild(el('span', 'mul', '· 점수 ×' + DIFF_MULT[setup.diff]));
   var vs = $('vsLine'); vs.textContent = '';
   vs.appendChild(el('b', '', TEAMS[setup.my].name)); vs.appendChild(document.createTextNode('  VS  '));
   vs.appendChild(el('span', '', TEAMS[setup.opp].name));
-  vs.appendChild(document.createTextNode('  ·  ' + setup.diff + ' · ' + setup.min + '분'));
+  vs.appendChild(document.createTextNode('  ·  ')); vs.appendChild(el('span', 'nw', setup.diff + ' · ' + setup.min + '분'));
 }
 function cleanNick(v) {
   var s = String(v || '').replace(/[\u0000-\u001F\u007F]/g, '').replace(/\s+/g, ' ').trim();
@@ -3024,6 +3160,7 @@ function startDemo() {
 }
 function startMatch(cfg) {
   Snd.init();
+  cfg.diff = normDiff(cfg.diff);
   G.cfg = cfg; G.demo = false; G.mode = 'match'; G.paused = false; G.saved = false; G.saving = false;
   G.matchId++; // 이전 경기의 저장 응답이 늦게 도착해도 이 경기 상태를 건드리지 않도록 구분
   G.halfShownAt = 0;
@@ -3164,7 +3301,9 @@ function loadRank() {
       gm.appendChild(el('span', 'show-sm', teamAbbr(r.myTeam) + ' ' + gl + ' ' + teamAbbr(r.oppTeam) + ' ' + String(r.result)));
       gm.title = String(r.myTeam) + ' ' + gl + ' ' + String(r.oppTeam) + ' (' + String(r.result) + ') · ' + String(r.difficulty) + ' · ' + String(r.date);
       tr.appendChild(gm);
-      tr.appendChild(el('td', 'hide-sm', String(r.difficulty)));
+      var dl = el('td', 'hide-sm', r.difficulty ? String(r.difficulty) : '-');
+      if (DIFF_LEGACY[r.difficulty]) dl.title = '이전 3단계 난이도 기록';
+      tr.appendChild(dl);
       tr.appendChild(el('td', 'hide-md', String(r.date)));
       tr.appendChild(el('td', 'sc', String(Number(r.score) || 0)));
       tb.appendChild(tr);
@@ -3192,7 +3331,7 @@ function bindUI() {
   for (i = 0; i < segs.length; i++) (function (id) {
     $(id).addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('button') : e.target; if (!b || !b.getAttribute('data-v')) return;
-      if (id === 'segDiff') setup.diff = b.getAttribute('data-v'); else setup.min = parseInt(b.getAttribute('data-v'), 10) || 4;
+      if (id === 'segDiff') { setup.diff = normDiff(b.getAttribute('data-v')); lsSet('seongmoSoccer.diff', setup.diff); } else setup.min = parseInt(b.getAttribute('data-v'), 10) || 4;
       renderSetup();
     });
   })(segs[i]);
@@ -3264,7 +3403,8 @@ window.__game = {
   },
   skipClock: function (left) { G.clock = Math.max(0, G.halfLen - left); },
   sim: function (sec) { var n = Math.round(sec / STEP); for (var i = 0; i < n; i++) step(STEP); return this.state; },
-  start: function (cfg) { startMatch(cfg || { my: 0, opp: 1, diff: '보통', min: 2, nick: '테스트' }); },
+  start: function (cfg) { startMatch(cfg || { my: 0, opp: 1, diff: '프로', min: 2, nick: '테스트' }); },
+  DIFFS: DIFFS, DIFF_ORDER: DIFF_ORDER,
   Input: Input, cam: cam,
   give: function (p) { setOwner(p); },
   step: function (n) { for (var i = 0; i < (n || 1); i++) step(STEP); return this.state; },

@@ -20,7 +20,10 @@ var TEAM_NAMES_ = [
   '성모 FC', '한강 유나이티드', '푸른별 시티', '백두 타이거즈',
   '은하 로버스', '청솔 워리어스', '바다 갈매기', '불꽃 레인저스'
 ];
-var DIFFICULTY_MULT_ = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
+// 난이도(6단계)별 점수 배율. index.html 의 DIFF_MULT 와 반드시 같아야 합니다. 새 기록은 이 이름만 저장할 수 있습니다.
+var DIFFICULTY_MULT_ = { '입문': 0.6, '아마추어': 0.9, '세미프로': 1.2, '프로': 1.5, '월드클래스': 2, '레전드': 2.5 };
+// 예전 3단계 난이도 (시트에 남아 있는 기록을 읽고 보여 주기 위한 용도, 새로 저장은 불가)
+var LEGACY_DIFFICULTY_MULT_ = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
 var RESULTS_ = ['승', '무', '패'];
 var NICK_MAX_ = 12;
 // 경기 시간(분) 화이트리스트와 현실적인 득점 상한 (내 팀 득점은 분당 최대 GOALS_PER_MIN_ 골, 실점은 GOALS_MAX_ 까지)
@@ -159,7 +162,8 @@ function getStats(nickname) {
 function computeScore_(gf, ga, difficulty) {
   var base = gf > ga ? 300 : (gf === ga ? 100 : 0);
   var raw = base + gf * 50 - ga * 20 + Math.max(0, gf - ga) * 30;
-  var mult = DIFFICULTY_MULT_[difficulty] || 1;
+  var mult = hasOwn_(DIFFICULTY_MULT_, difficulty) ? DIFFICULTY_MULT_[difficulty]
+    : (hasOwn_(LEGACY_DIFFICULTY_MULT_, difficulty) ? LEGACY_DIFFICULTY_MULT_[difficulty] : 1);
   return Math.max(0, Math.round(raw * mult));
 }
 
@@ -181,8 +185,8 @@ function sanitizeRecord_(r) {
   var gf = toInt_(r.goalsFor, 0, goalCap);
   var ga = toInt_(r.goalsAgainst, 0, GOALS_MAX_);
   if (gf === null || ga === null) throw new Error('득점/실점 값이 올바르지 않습니다.');
-  var difficulty = cleanText_(r.difficulty, 5);
-  if (!Object.prototype.hasOwnProperty.call(DIFFICULTY_MULT_, difficulty)) {
+  var difficulty = cleanText_(r.difficulty, 10);
+  if (!hasOwn_(DIFFICULTY_MULT_, difficulty)) {
     throw new Error('알 수 없는 난이도입니다.');
   }
   // 결과는 클라이언트 값을 믿지 않고 득실로 다시 계산합니다.
@@ -199,6 +203,11 @@ function sanitizeRecord_(r) {
     result: result,
     score: computeScore_(gf, ga, difficulty)
   };
+}
+
+/** 객체가 그 이름의 항목을 직접 갖고 있는지 (프로토타입 이름 'constructor' 등은 제외) */
+function hasOwn_(obj, key) {
+  return typeof key === 'string' && Object.prototype.hasOwnProperty.call(obj, key);
 }
 
 /** 제어 문자 제거, 공백 정리, 길이 제한 */
