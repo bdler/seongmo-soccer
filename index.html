@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성모 사커</title>
+<meta name="theme-color" content="#06120b">
+<!-- 태블릿/휴대폰에서 '홈 화면에 추가'로 열면 주소창 없이 전체 화면처럼 -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="성모 사커">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
@@ -16,8 +22,11 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:var(--body);
-  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
-#cv{position:fixed;left:0;top:0;width:100vw;height:100vh;display:block;outline:none;touch-action:none}
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* 메뉴는 두 번 탭 확대 없이 바로 반응 (태블릿), 경기 화면은 모든 제스처를 게임이 처리 */
+html{touch-action:manipulation}
+body{height:100vh;height:100dvh}
+#cv{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;display:block;outline:none;touch-action:none}
 .hidden{display:none!important}
 .screen{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;padding:16px;z-index:10;overflow-y:auto;-webkit-overflow-scrolling:touch;
   --scr-pb:max(16px, env(safe-area-inset-bottom, 0px));padding-top:max(16px, env(safe-area-inset-top, 0px));padding-bottom:var(--scr-pb);
@@ -32,13 +41,13 @@ h3{font-size:14px;color:var(--muted);margin:14px 0 7px;font-weight:700;letter-sp
 .phead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
 .btn{display:block;width:100%;margin:10px 0 0;padding:14px 16px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.07);
   color:var(--txt);font:800 17px var(--body);cursor:pointer;transition:transform .08s,background .15s}
-.btn:hover{background:rgba(255,255,255,.13)}
+@media (hover:hover){.btn:hover{background:rgba(255,255,255,.13)}}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:linear-gradient(180deg,#fde047,#eab308);color:#1c1917;border:none;box-shadow:0 6px 22px rgba(234,179,8,.35)}
-.btn.primary:hover{background:linear-gradient(180deg,#fef08a,#facc15)}
+@media (hover:hover){.btn.primary:hover{background:linear-gradient(180deg,#fef08a,#facc15)}}
 .btn.big{font-size:21px;padding:16px}
 .btn[disabled]{opacity:.55;cursor:default}
-.back{background:none;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:7px 12px;font:700 14px var(--body);cursor:pointer}
+.back{background:none;border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:0 16px;min-height:48px;min-width:72px;font:700 15px var(--body);cursor:pointer;flex:none}
 .row{display:flex;gap:10px}.row>*{flex:1}
 .setup-row{flex-wrap:wrap;column-gap:14px}.setup-row>*{flex:1 1 250px}
 input.txt#nick{padding:10px 14px}
@@ -54,7 +63,7 @@ input.txt#nick{padding:10px 14px}
 .teams{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .team-card{display:flex;flex-direction:column;gap:8px;text-align:left;padding:9px 10px;border-radius:13px;background:var(--panel2);
   border:2px solid transparent;color:inherit;font:inherit;cursor:pointer;min-width:0}
-.team-card:hover{background:rgba(255,255,255,.09)}
+@media (hover:hover){.team-card:hover{background:rgba(255,255,255,.09)}}
 .team-card.sel{border-color:var(--acc);background:rgba(250,204,21,.11)}
 .team-card.dis{opacity:.32;cursor:not-allowed}
 .tc-top{display:flex;align-items:center;gap:8px;min-width:0}
@@ -67,9 +76,9 @@ input.txt#nick{padding:10px 14px}
 .bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#22c55e,#facc15)}
 .seg{display:flex;gap:6px}
-.seg button{flex:1;padding:11px 6px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:700 15px var(--body);cursor:pointer}
+.seg button{flex:1;min-height:48px;padding:11px 6px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:700 15px var(--body);cursor:pointer}
 .seg button.sel{background:var(--acc);color:#1c1917;border-color:var(--acc)}
-input.txt{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
+input.txt{width:100%;min-height:48px;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
   font:700 16px var(--body);outline:none;-webkit-user-select:text;user-select:text}
 input.txt:focus{border-color:var(--acc)}
 .vs{margin-top:12px;text-align:center;font-weight:800;font-size:16px;color:#e2e8f0}
@@ -80,6 +89,14 @@ table.ctl th,table.ctl td{padding:9px 8px;border-bottom:1px solid var(--line);te
 table.ctl th{color:var(--muted);font-size:12px}
 kbd{display:inline-block;padding:1px 7px;border-radius:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);font:700 12px var(--body);margin:1px 2px}
 .tips{color:var(--muted);font-size:13px;line-height:1.65;margin:12px 0 0;padding-left:18px}
+.help-panel{max-width:1100px}
+.help-sub{color:var(--muted);font-size:13px;font-weight:700;margin-left:auto}
+.help-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 20px;align-items:start}
+.help-grid h3{margin-top:4px}
+.help-grid table.ctl{margin-top:0;font-size:13.5px}
+.help-grid table.ctl td{padding:6px 6px}
+.help-grid table.ctl td:first-child{white-space:nowrap;width:1%}
+
 /* 결과 */
 .res-title{font-family:var(--title);font-size:52px;text-align:center;margin:4px 0}
 .res-title.win{color:#4ade80}.res-title.draw{color:#facc15}.res-title.lose{color:#f87171}
@@ -94,6 +111,7 @@ kbd{display:inline-block;padding:1px 7px;border-radius:6px;background:rgba(255,2
 .points{text-align:center;margin:14px 0 4px;font-size:15px;color:var(--muted)}
 .points b{font-family:var(--title);font-weight:400;color:var(--acc);font-size:30px;margin:0 4px}
 .msg{min-height:22px;text-align:center;font-size:14px;margin-top:8px;font-weight:700}
+#saveMsg:empty{min-height:0;margin:0}
 .msg.ok{color:#4ade80}.msg.err{color:var(--bad)}.msg.info{color:var(--info)}
 /* 랭킹 */
 .rank-wrap{max-height:56vh;overflow:auto;margin-top:10px;border-radius:12px;border:1px solid var(--line)}
@@ -120,30 +138,57 @@ table.rank td.nk{max-width:150px;overflow:hidden;text-overflow:ellipsis}
 .icon-btn{width:42px;height:42px;border-radius:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.22);color:#fff;
   display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .icon-btn svg{width:22px;height:22px}
-/* 터치 컨트롤 */
-#touch{position:fixed;left:0;top:0;right:0;bottom:0;z-index:5;pointer-events:none}
-/* 조이스틱 영역은 오른쪽 버튼 묶음(#btns) 앞에서 끝나야 합니다 */
-#joyZone{position:absolute;left:0;bottom:0;width:48%;max-width:calc(100% - 200px);max-width:calc(100% - 200px - env(safe-area-inset-right, 0px));
-  height:70%;pointer-events:auto;touch-action:none}
-#joyBase{position:absolute;width:124px;height:124px;border-radius:50%;border:2px solid rgba(255,255,255,.38);background:rgba(255,255,255,.07);
-  left:34px;bottom:34px;pointer-events:none;
-  left:calc(34px + env(safe-area-inset-left, 0px));bottom:calc(34px + env(safe-area-inset-bottom, 0px))}
-#joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.55);
-  box-shadow:0 2px 10px rgba(0,0,0,.4)}
-#btns{position:absolute;right:10px;bottom:12px;width:180px;height:230px;pointer-events:none;
-  right:calc(10px + env(safe-area-inset-right, 0px));bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
-.tbtn{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(0,0,0,.38);color:#fff;
-  font:800 15px var(--body);touch-action:none;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:0}
-.tbtn.on{background:rgba(250,204,21,.65);color:#111}
+body.touch .icon-btn{width:50px;height:50px;border-radius:14px}
+body.touch .icon-btn svg{width:26px;height:26px}
+/* 터치 컨트롤 (태블릿 우선: 버튼 크기는 화면 짧은 변에 비례, --u = 기본 단위) */
+#touch{position:fixed;left:0;top:0;right:0;bottom:0;z-index:5;pointer-events:none;
+  --u:clamp(56px, 11.5vmin, 108px);--sr:env(safe-area-inset-right, 0px);--sl:env(safe-area-inset-left, 0px);--sb:env(safe-area-inset-bottom, 0px)}
+/* 떠다니는 조이스틱: 왼쪽 영역 아무 곳이나 누르면 그 자리에 나타납니다. 오른쪽 버튼 묶음(#btns) 앞에서 끝나야 합니다 */
+#joyZone{position:absolute;left:0;bottom:0;top:calc(66px + env(safe-area-inset-top, 0px));width:45%;
+  max-width:calc(100% - var(--u) * 4.45 - var(--sr) - 16px);pointer-events:auto;touch-action:none}
+#joyBase{position:absolute;width:calc(var(--u) * 1.6);height:calc(var(--u) * 1.6);border-radius:50%;border:2px solid rgba(255,255,255,.4);
+  background:rgba(255,255,255,.07);pointer-events:none;opacity:.5;transition:opacity .15s;
+  left:calc(var(--u) * .45 + var(--sl));bottom:calc(var(--u) * .45 + var(--sb))}
+#joyZone.act #joyBase{opacity:1;transition:none}
+#joyKnob{position:absolute;left:50%;top:50%;width:calc(var(--u) * .7);height:calc(var(--u) * .7);margin:calc(var(--u) * -.35) 0 0 calc(var(--u) * -.35);
+  border-radius:50%;background:rgba(255,255,255,.58);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+#btns{position:absolute;right:calc(10px + var(--sr));bottom:calc(10px + var(--sb));width:calc(var(--u) * 4.25);height:calc(var(--u) * 3.45);pointer-events:none}
+/* 각 버튼: --cx/--cy = 버튼 중심(묶음 오른쪽 아래 기준, --u 단위), --d = 지름 */
+.tbtn{position:absolute;--d:1;--cx:1;--cy:1;width:calc(var(--u) * var(--d));height:calc(var(--u) * var(--d));
+  right:calc(var(--u) * (var(--cx) - var(--d) / 2));bottom:calc(var(--u) * (var(--cy) - var(--d) / 2));
+  border-radius:50%;border:2px solid var(--bc, rgba(255,255,255,.55));background:rgba(0,0,0,.42);color:#fff;
+  font:800 calc(var(--u) * .2) var(--body);line-height:1.1;touch-action:none;pointer-events:auto;padding:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.35);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .06s,opacity .15s}
+.tbtn .lb{position:relative;white-space:nowrap}
+.tbtn.long .lb{font-size:calc(var(--u) * .165)}
+.tbtn .k{position:relative;font-size:calc(var(--u) * .13);font-weight:700;opacity:.72;margin-top:2px;white-space:nowrap}
+.tbtn.on{background:rgba(250,204,21,.72);color:#111;transform:scale(.93)}
+.tbtn.latch{background:rgba(56,189,248,.62);color:#04111c}
+.tbtn.dim{opacity:.4}
+.tbtn .cd{position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(rgba(0,0,0,.66) calc(var(--c, 0) * 1turn), transparent 0)}
+.tbtn .gauge{position:absolute;inset:-8px;border-radius:50%;pointer-events:none;display:none;
+  background:conic-gradient(var(--gc, #4ade80) calc(var(--g, 0) * 1turn), rgba(255,255,255,.14) 0);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  mask:radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px))}
+.tbtn.charging .gauge{display:block}
+#tb-shoot{--d:1.32;--cx:1;--cy:1;--bc:#fca5a5;font-size:calc(var(--u) * .27)}
+#tb-pass{--d:1.1;--cx:2.4;--cy:.7;--bc:#86efac;font-size:calc(var(--u) * .23)}
+#tb-through{--d:.95;--cx:2.3;--cy:1.98;--bc:#93c5fd}
+#tb-lob{--d:.95;--cx:1.05;--cy:2.5;--bc:#c4b5fd}
+#tb-sprint{--d:.95;--cx:3.6;--cy:.6;--bc:#fde68a}
+#tb-skill{--d:.82;--cx:3.5;--cy:1.8;--bc:#f9a8d4}
+#tb-mod{--d:.72;--cx:2.25;--cy:3.05;--bc:#7dd3fc}
+/* 세로 휴대폰에서만: 가로 모드 권장 안내 (막지 않고 잠시 보였다 사라짐) */
+#rotHint{display:none;position:absolute;left:calc(10px + env(safe-area-inset-left, 0px));top:calc(66px + env(safe-area-inset-top, 0px));
+  background:rgba(0,0,0,.66);color:#fde047;font:800 13px var(--body);padding:7px 14px;border-radius:16px;white-space:nowrap;
+  animation:hintFade 6s forwards}
+@keyframes hintFade{0%,75%{opacity:1}100%{opacity:0;visibility:hidden}}
+@media (orientation:portrait) and (max-width:600px){#rotHint{display:block}}
 /* 킥오프 버튼 줄: 스크롤해도 아래에 붙어 있고, 뒤의 내용이 비치지 않도록 불투명 배경 */
 /* bottom 을 화면 아래 여백만큼 음수로 두어, 스크롤 중에도 버튼 아래로 팀 카드가 비쳐 보이지 않게 합니다 */
-.kick-bar{position:sticky;bottom:0;bottom:calc(0px - var(--scr-pb, 16px));z-index:2;margin:0 -22px -22px;padding:4px 22px 16px;background:#0a1711;border-radius:0 0 20px 20px;
+.kick-bar{position:sticky;bottom:0;bottom:calc(0px - var(--scr-pb, 16px));z-index:2;margin:14px -22px -22px;padding:4px 22px 16px;background:#0a1711;border-radius:0 0 20px 20px;
   box-shadow:0 -14px 14px -4px #0a1711}
-#tb-shoot{width:88px;height:88px;right:4px;bottom:44px;border-color:#fca5a5;font-size:18px}
-#tb-pass{width:72px;height:72px;right:100px;bottom:4px;border-color:#86efac}
-#tb-through{width:64px;height:64px;right:104px;bottom:92px;border-color:#93c5fd}
-#tb-sprint{width:60px;height:60px;right:14px;bottom:146px}
-#tb-sw{width:54px;height:54px;right:98px;bottom:168px;font-size:13px}
 .show-sm{display:none}
 @media (max-width:760px){.teams{grid-template-columns:repeat(2,1fr)} .logo{font-size:52px}}
 @media (max-width:520px){.panel{padding:16px;border-radius:16px} h2{font-size:23px} .hide-sm{display:none} .show-sm{display:inline}
@@ -158,8 +203,6 @@ table.rank td.nk{max-width:150px;overflow:hidden;text-overflow:ellipsis}
   .stats{gap:4px}}
 /* 가로 휴대폰 등 낮은 화면: 모달·메뉴를 한 화면에 들어오게 */
 @media (max-height:520px){
-  #btns{transform:scale(.82);transform-origin:right bottom} #joyBase{width:108px;height:108px;left:22px;bottom:18px;
-    left:calc(22px + env(safe-area-inset-left, 0px));bottom:calc(18px + env(safe-area-inset-bottom, 0px))}
   .screen{--scr-pb:max(8px, env(safe-area-inset-bottom, 0px));padding:8px;padding-top:max(8px, env(safe-area-inset-top, 0px));padding-bottom:var(--scr-pb);
     padding-left:max(8px, env(safe-area-inset-left, 0px));padding-right:max(8px, env(safe-area-inset-right, 0px))}
   .panel{padding:12px 16px;border-radius:14px}
@@ -188,12 +231,15 @@ table.rank td.nk{max-width:150px;overflow:hidden;text-overflow:ellipsis}
 
 <div id="touch" class="hidden">
   <div id="joyZone"><div id="joyBase"><div id="joyKnob"></div></div></div>
+  <div id="rotHint">가로 모드를 권장합니다</div>
   <div id="btns">
-    <button class="tbtn" id="tb-shoot" data-act="shoot">슛</button>
-    <button class="tbtn" id="tb-pass" data-act="pass">패스</button>
-    <button class="tbtn" id="tb-through" data-act="through">스루</button>
-    <button class="tbtn" id="tb-sprint" data-act="sprint">질주</button>
-    <button class="tbtn" id="tb-sw" data-act="sw">전환</button>
+    <button class="tbtn" id="tb-shoot" data-act="shoot" aria-label="슛 (D)"><i class="gauge"></i><span class="lb">슛</span><span class="k">D</span></button>
+    <button class="tbtn" id="tb-pass" data-act="pass" aria-label="패스 (S)"><i class="gauge"></i><span class="lb">패스</span><span class="k">S</span></button>
+    <button class="tbtn" id="tb-through" data-act="through" aria-label="스루 패스 (W)"><span class="lb">스루</span><span class="k">W</span></button>
+    <button class="tbtn" id="tb-lob" data-act="lob" aria-label="로빙 패스 / 크로스 (A)"><i class="cd"></i><span class="lb">로빙</span><span class="k">A</span></button>
+    <button class="tbtn" id="tb-sprint" data-act="sprint" aria-label="질주 (E)"><span class="lb">질주</span><span class="k">E</span></button>
+    <button class="tbtn" id="tb-skill" data-act="skill" aria-label="개인기 (C)"><i class="cd"></i><span class="lb">개인기</span><span class="k">C</span></button>
+    <button class="tbtn" id="tb-mod" data-act="mod" aria-label="Q 보조 키"><span class="lb">Q</span><span class="k">감아·로빙</span></button>
   </div>
 </div>
 
@@ -242,26 +288,60 @@ table.rank td.nk{max-width:150px;overflow:hidden;text-overflow:ellipsis}
 
 <!-- 조작법 -->
 <div id="scr-help" class="screen hidden">
-  <div class="panel">
-    <div class="phead"><button class="back" data-back="prev">‹ 뒤로</button><h2>조작법</h2></div>
-    <table class="ctl">
-      <tr><th>동작</th><th>키보드</th><th>터치</th></tr>
-      <tr><td>이동</td><td><kbd>←↑↓→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></td><td>왼쪽 조이스틱</td></tr>
-      <tr><td>스프린트</td><td><kbd>Shift</kbd> / <kbd>L</kbd></td><td>질주 (누르고 있기)</td></tr>
-      <tr><td>짧은 패스</td><td><kbd>Space</kbd> / <kbd>J</kbd></td><td>패스</td></tr>
-      <tr><td>슛 (파워 충전)</td><td><kbd>K</kbd> 길게 눌렀다 떼기</td><td>슛 (길게 누르기)</td></tr>
-      <tr><td>스루 / 로빙 패스</td><td><kbd>I</kbd></td><td>스루</td></tr>
-      <tr><td>선수 전환</td><td><kbd>Q</kbd></td><td>전환</td></tr>
-      <tr><td>수비: 태클 · 압박</td><td><kbd>J</kbd> (누르고 있으면 압박)</td><td>태클</td></tr>
-      <tr><td>수비: 슬라이딩</td><td><kbd>K</kbd></td><td>슬라이딩</td></tr>
-      <tr><td>일시정지</td><td><kbd>Esc</kbd> / <kbd>P</kbd></td><td>오른쪽 위 버튼</td></tr>
-    </table>
+  <div class="panel wide help-panel">
+    <div class="phead"><button class="back" data-back="prev">‹ 뒤로</button><h2>조작법</h2><span class="help-sub">피파온라인(FC 온라인) 방식</span></div>
+    <div class="help-grid">
+      <section class="hk">
+        <h3>키보드 · 공격 (우리 공)</h3>
+        <table class="ctl">
+          <tr><td><kbd>←↑↓→</kbd></td><td>이동</td></tr>
+          <tr><td><kbd>E</kbd></td><td>질주 (스태미나 소모)</td></tr>
+          <tr><td><kbd>S</kbd></td><td>짧은 패스 (길게 누르면 더 세게·멀리)</td></tr>
+          <tr><td><kbd>A</kbd></td><td>로빙 패스 · 측면 끝에서는 크로스</td></tr>
+          <tr><td><kbd>W</kbd></td><td>스루 패스 (땅볼, 앞 공간으로)</td></tr>
+          <tr><td><kbd>Q</kbd>+<kbd>W</kbd></td><td>로빙 스루 패스</td></tr>
+          <tr><td><kbd>D</kbd></td><td>슛 (누르고 있다가 떼기 = 파워)</td></tr>
+          <tr><td><kbd>Q</kbd>+<kbd>D</kbd></td><td>감아차기 (정확하지만 약간 느림)</td></tr>
+          <tr><td><kbd>C</kbd></td><td>개인기 · 탈압박 (순간 가속, 쿨타임 2초)</td></tr>
+        </table>
+        <h3>세트피스 (킥오프·스로인·코너킥·골킥)</h3>
+        <table class="ctl">
+          <tr><td><kbd>S</kbd> / <kbd>Space</kbd></td><td>짧은 패스 · 킥오프</td></tr>
+          <tr><td><kbd>A</kbd> · <kbd>W</kbd> · <kbd>D</kbd></td><td>로빙(코너: 크로스) · 스루 · 롱킥</td></tr>
+        </table>
+      </section>
+      <section class="hk">
+        <h3>키보드 · 수비 (상대 공 / 떠 있는 공)</h3>
+        <table class="ctl">
+          <tr><td><kbd>Q</kbd></td><td>선수 전환 (공에 가장 가까운 선수)</td></tr>
+          <tr><td><kbd>S</kbd> 누르고 있기</td><td>압박 · 견제 (자동으로 따라붙어 태클)</td></tr>
+          <tr><td><kbd>D</kbd></td><td>태클</td></tr>
+          <tr><td><kbd>A</kbd></td><td>슬라이딩 태클 (쿨타임)</td></tr>
+          <tr><td><kbd>C</kbd> 누르고 있기</td><td>팀원 압박 (동료 한 명이 함께 압박)</td></tr>
+          <tr><td><kbd>W</kbd> 누르고 있기</td><td>골키퍼 전진</td></tr>
+          <tr><td><kbd>E</kbd></td><td>질주</td></tr>
+          <tr><td><kbd>Esc</kbd> / <kbd>P</kbd> · <kbd>M</kbd></td><td>일시정지 · 소리 켜기/끄기</td></tr>
+        </table>
+      </section>
+      <section class="ht">
+        <h3>태블릿 · 터치</h3>
+        <table class="ctl">
+          <tr><td>왼쪽 화면</td><td>아무 곳이나 눌러 끌기 = 조이스틱 (손가락 아래에 나타남)</td></tr>
+          <tr><td>오른쪽 버튼</td><td>공격: <b>슛</b>(길게=파워) · <b>패스</b>(길게=세게) · <b>스루</b> · <b>로빙/크로스</b> · <b>질주</b> · <b>개인기</b></td></tr>
+          <tr><td></td><td>수비: <b>압박</b>(누르고 있기) · <b>태클</b> · <b>슬라이딩</b> · <b>전환</b> · <b>팀원압박</b> · <b>GK 전진</b> · <b>질주</b></td></tr>
+          <tr><td><b>Q</b> 버튼</td><td>공격 중 한 번 누르면 파랗게 켜짐 → 다음 <b>스루</b> = 로빙 스루, 다음 <b>슛</b> = 감아차기 (누른 채로 함께 눌러도 됨)</td></tr>
+          <tr><td>동시 입력</td><td>조이스틱을 움직이면서 버튼을 누를 수 있습니다</td></tr>
+        </table>
+        <ul class="tips">
+          <li>태블릿은 <b>가로 모드</b>를 권장합니다. 사파리/크롬의 <b>홈 화면에 추가</b>로 열면 주소창 없이 더 넓게 즐길 수 있습니다.</li>
+          <li>버튼 이름은 공격/수비 상황에 따라 자동으로 바뀝니다. 회색 원이 돌아가는 버튼은 쿨타임 중입니다.</li>
+        </ul>
+      </section>
+    </div>
     <ul class="tips">
-      <li>슛은 방향키 위/아래로 골대 안쪽 조준이 가능합니다. 너무 세게 차면 공이 뜹니다!</li>
-      <li>패스는 바라보는(입력한) 방향의 동료에게 자동으로 연결됩니다.</li>
-      <li>스루 패스는 수비수 사이가 막혀 있으면 로빙 패스로 넘어갑니다.</li>
-      <li>코너킥·스로인·골킥: <kbd>J</kbd> 짧은 패스, <kbd>I</kbd> 로빙, <kbd>K</kbd> 롱킥/크로스.</li>
-      <li>스태미나가 떨어지면 속도가 느려집니다. 스프린트를 아껴 쓰세요.</li>
+      <li>슛은 방향키(조이스틱) 위/아래로 골대 안쪽을 조준합니다. 너무 세게 차면 공이 뜹니다!</li>
+      <li>패스는 입력한 방향의 동료에게 자동으로 연결됩니다. 방향 입력이 없으면 바라보는 방향으로 찹니다.</li>
+      <li>스태미나가 떨어지면 느려집니다. 질주는 아껴 쓰세요.</li>
     </ul>
   </div>
 </div>
@@ -300,8 +380,8 @@ table.rank td.nk{max-width:150px;overflow:hidden;text-overflow:ellipsis}
     <div class="row">
       <button class="btn" id="btnResRank">랭킹 보기</button>
       <button class="btn" id="btnAgain">다시 하기</button>
+      <button class="btn" id="btnResMenu">메인으로</button>
     </div>
-    <button class="btn" id="btnResMenu">메인으로</button>
   </div>
 </div>
 
@@ -365,6 +445,8 @@ var BASE_SPEED = 160, SPRINT_MUL = 1.42;
 var H_PROJ = 0.55; // 높이(z) → 화면 y 투영 비율
 var CHEST_Z = 26;  // 패스 받는 선수가 가슴으로 공을 받아 낼 수 있는 최대 높이
 var VIEW_OUT_X = 125, VIEW_OUT_Y = 115;
+var FEINT_T = 0.45, FEINT_CD = 2.0; // 개인기(C): 순간 가속·태클 면역 시간, 쿨타임
+var SLIDE_CD = 1.5;
 
 // 가상 팀 (실존 구단/선수와 무관)
 var TEAMS = [
@@ -427,7 +509,7 @@ var G = {
 var ball = {
   x: CX, y: CY, z: 0, vx: 0, vy: 0, vz: 0, owner: null, kicker: null, kickTime: -9, ownT: 0,
   lastTouch: null, lastTeam: null, passTarget: null, pendingPass: null, shotBy: null, shotOn: false, shotX: CX, shotY: CY,
-  inGoal: 0, spin: 0, lastPostT: -9
+  inGoal: 0, spin: 0, lastPostT: -9, curve: 0, curveT: 0
 };
 var TMP = { x: 0, y: 0, z: 0, t: 0 }, TMP2 = { x: 0, y: 0, z: 0, t: 0 };
 var BP = { r: null, score: 0, kind: 'ground' };
@@ -581,37 +663,47 @@ var Snd = {
  * 4. 입력 (키보드 + 터치)
  * ===================================================================== */
 var Input = {
-  held: { up: false, down: false, left: false, right: false, sprint: false, pass: false, shoot: false, through: false, sw: false },
-  pressed: { pass: false, shoot: false, through: false, sw: false },
-  released: { shoot: false },
+  held: { up: false, down: false, left: false, right: false, sprint: false, pass: false, lob: false, through: false, shoot: false, mod: false, skill: false },
+  pressed: { pass: false, lob: false, through: false, shoot: false, mod: false, skill: false },
+  released: { pass: false, shoot: false },
   joy: { active: false, x: 0, y: 0, id: -1, cx: 0, cy: 0 },
-  ax: 0, ay: 0
+  ax: 0, ay: 0,
+  modLatch: false // 터치: Q 버튼을 한 번 누르면 다음 스루/슛에 Q 가 적용됩니다
 };
+// 피파온라인(FC 온라인) 기본 키보드 배치. 물리 키 위치(e.code)로 판단하므로 한글 입력 상태에서도 동작합니다.
 var KEYMAP = {
-  ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
-  ShiftLeft: 'sprint', ShiftRight: 'sprint', KeyL: 'sprint', Space: 'pass', KeyJ: 'pass', KeyK: 'shoot', KeyI: 'through', KeyQ: 'sw'
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  KeyS: 'pass', KeyA: 'lob', KeyW: 'through', KeyD: 'shoot', KeyQ: 'mod', KeyE: 'sprint', KeyC: 'skill',
+  Space: 'pass', ShiftLeft: 'sprint', ShiftRight: 'sprint'
 };
-var KEYMAP2 = { // e.code 가 없는 브라우저 대비
-  arrowup: 'up', w: 'up', arrowdown: 'down', s: 'down', arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right',
-  shift: 'sprint', l: 'sprint', ' ': 'pass', j: 'pass', k: 'shoot', i: 'through', q: 'sw',
-  'ㅈ': 'up', 'ㄴ': 'down', 'ㅁ': 'left', 'ㅇ': 'right', 'ㅓ': 'pass', 'ㅏ': 'shoot', 'ㅑ': 'through', 'ㅂ': 'sw', 'ㅣ': 'sprint'
+var KEYMAP2 = { // e.code 를 주지 않는 오래된 브라우저 대비 (e.key 기준, 한글 두벌식 자모 포함)
+  arrowup: 'up', arrowdown: 'down', arrowleft: 'left', arrowright: 'right', up: 'up', down: 'down', left: 'left', right: 'right',
+  s: 'pass', a: 'lob', w: 'through', d: 'shoot', q: 'mod', e: 'sprint', c: 'skill', ' ': 'pass', spacebar: 'pass', shift: 'sprint',
+  'ㄴ': 'pass', 'ㅁ': 'lob', 'ㅈ': 'through', 'ㅉ': 'through', 'ㅇ': 'shoot', 'ㅂ': 'mod', 'ㅃ': 'mod', 'ㄷ': 'sprint', 'ㄸ': 'sprint', 'ㅊ': 'skill'
 };
 function actDown(a) {
-  if (!Input.held[a]) { if (Input.pressed.hasOwnProperty(a)) Input.pressed[a] = true; }
+  if (!Input.held[a] && Input.pressed.hasOwnProperty(a)) Input.pressed[a] = true;
   Input.held[a] = true;
 }
 function actUp(a) {
-  if (Input.held[a] && a === 'shoot') Input.released.shoot = true;
+  if (Input.held[a] && Input.released.hasOwnProperty(a)) Input.released[a] = true;
   Input.held[a] = false;
 }
+var touchBtns = [];
 function resetInput() {
-  for (var k in Input.held) if (Input.held.hasOwnProperty(k)) Input.held[k] = false;
-  Input.pressed.pass = Input.pressed.shoot = Input.pressed.through = Input.pressed.sw = false;
-  Input.released.shoot = false;
+  var k;
+  for (k in Input.held) if (Input.held.hasOwnProperty(k)) Input.held[k] = false;
+  for (k in Input.pressed) if (Input.pressed.hasOwnProperty(k)) Input.pressed[k] = false;
+  for (k in Input.released) if (Input.released.hasOwnProperty(k)) Input.released[k] = false;
+  Input.modLatch = false;
   Input.joy.active = false; Input.joy.x = Input.joy.y = 0; Input.joy.id = -1;
   var knob = $('joyKnob'); if (knob) knob.style.transform = '';
-  // 슛 충전 중에 일시정지/포커스 이탈이 일어나면 충전을 취소 (떼는 입력을 놓쳐 파워 바가 멈춰 남지 않도록)
-  if (G.human && G.human.ctrl) G.human.ctrl.charge = 0;
+  var zone = $('joyZone'); if (zone) zone.classList.remove('act');
+  var jb = $('joyBase'); if (jb) jb.style.left = jb.style.top = jb.style.bottom = '';
+  // 누르고 있던 터치 버튼도 모두 놓은 상태로 (다음 pointerup 을 기다리지 않음)
+  for (var i = 0; i < touchBtns.length; i++) { touchBtns[i]._pid = -1; touchBtns[i].classList.remove('on'); }
+  // 슛/패스 충전 중에 일시정지/포커스 이탈이 일어나면 충전을 취소 (떼는 입력을 놓쳐 파워 바가 멈춰 남지 않도록)
+  if (G.human && G.human.ctrl) { G.human.ctrl.charge = 0; G.human.ctrl.passCharge = 0; }
 }
 function readAxis() {
   var x, y;
@@ -625,8 +717,10 @@ function readAxis() {
   Input.ax = x; Input.ay = y;
 }
 function keyAction(e) {
-  var a = KEYMAP[e.code];
-  if (!a && e.key) a = KEYMAP2[e.key.toLowerCase()];
+  var code = e.code || '';
+  var a = code ? KEYMAP[code] : null;
+  // e.code 가 없을 때만 e.key 로 대신합니다. (한글 IME 조합 중에는 e.key 가 'Process' 이므로 사용할 수 없음)
+  if (!a && (!code || code === 'Unidentified') && e.key && e.key !== 'Process' && e.key !== 'Unidentified') a = KEYMAP2[e.key.toLowerCase()];
   return a || null;
 }
 function isTyping(e) {
@@ -643,8 +737,9 @@ window.addEventListener('keydown', function (e) {
     }
     return;
   }
+  if (e.code === 'KeyM' && !e.repeat && (G.mode === 'match' || G.mode === 'result')) { Snd.setMuted(!Snd.muted); e.preventDefault(); return; }
   if (G.mode === 'match' && G.phase === 'halftime') {
-    if (e.code === 'Enter' || e.code === 'Space') {
+    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter') {
       e.preventDefault();
       // 패스(Space)를 누르고 있던 자동 반복 입력이나, 하프타임 직후의 우발적인 입력으로 통계 화면이 넘어가지 않도록
       if (!e.repeat && nowMs() - G.halfShownAt > HALF_KEY_GRACE_MS) startSecondHalf();
@@ -655,6 +750,8 @@ window.addEventListener('keydown', function (e) {
   if (!a) return;
   if (G.mode === 'match' && !G.paused) {
     e.preventDefault();
+    // 태블릿에 키보드를 연결해 쓰면 화면 버튼을 숨깁니다 (다시 화면을 터치하면 나타남)
+    if (G.touchMode) setTouchMode(false);
     if (!e.repeat) actDown(a); else Input.held[a] = true;
   }
 });
@@ -662,12 +759,29 @@ window.addEventListener('keyup', function (e) {
   if (isTyping(e)) return;
   var a = keyAction(e);
   if (!a) return;
-  if (a === 'sprint' && (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.key === 'Shift')) { actUp('sprint'); return; }
   actUp(a);
   if (G.mode === 'match') e.preventDefault();
 });
 
 /* 터치 컨트롤 */
+function setTouchMode(on) {
+  G.touchMode = !!on;
+  document.body.classList.toggle('touch', G.touchMode);
+  var tc = $('touch');
+  if (tc) tc.classList.toggle('hidden', !(G.touchMode && G.mode === 'match'));
+  if (!G.touchMode) resetTouchState();
+  touchCtx = null;
+  // 조작법 화면: 터치 기기에서는 터치 조작을 먼저 보여 줍니다
+  var hg = document.querySelector('.help-grid'), ht = hg && hg.querySelector('.ht');
+  if (ht) { if (G.touchMode) hg.insertBefore(ht, hg.firstChild); else hg.appendChild(ht); }
+}
+function resetTouchState() {
+  Input.joy.active = false; Input.joy.x = Input.joy.y = 0; Input.joy.id = -1;
+  for (var i = 0; i < touchBtns.length; i++) {
+    var b = touchBtns[i];
+    if (b._pid !== -1) { b._pid = -1; b.classList.remove('on'); actUp(b.getAttribute('data-act')); }
+  }
+}
 function setupTouch() {
   var zone = $('joyZone'), base = $('joyBase'), knob = $('joyKnob');
   var R = 52; // 손잡이 최대 이동 반경 (받침 크기에 비례해 pointerdown 때 다시 계산)
@@ -683,8 +797,9 @@ function setupTouch() {
     e.preventDefault(); Snd.init();
     if (Input.joy.id !== -1) return;
     Input.joy.id = e.pointerId; Input.joy.active = true;
+    zone.classList.add('act');
     var zr = zone.getBoundingClientRect();
-    // 받침 크기는 화면에 따라 CSS 로 바뀌므로(124px / 108px) 실제 크기로 계산해 손가락 바로 아래에 놓습니다.
+    // 받침 크기는 화면 크기에 따라 CSS 로 바뀌므로 실제 크기로 계산해 손가락 바로 아래에 놓습니다.
     var hb = (base.offsetWidth || 124) / 2;
     R = hb * 0.84;
     var bx = clamp(e.clientX - zr.left, hb + 2 + safe.l, Math.max(hb + 2 + safe.l, zr.width - hb - 2));
@@ -699,6 +814,9 @@ function setupTouch() {
     if (e.pointerId !== Input.joy.id) return;
     Input.joy.id = -1; Input.joy.active = false; Input.joy.x = Input.joy.y = 0;
     knob.style.transform = '';
+    zone.classList.remove('act');
+    // 손을 떼면 받침은 기본 위치로 돌아갑니다 (다음 터치 때 다시 손가락 아래에 나타남)
+    base.style.left = base.style.top = base.style.bottom = '';
   }
   zone.addEventListener('pointerup', joyEnd);
   zone.addEventListener('pointercancel', joyEnd);
@@ -706,13 +824,19 @@ function setupTouch() {
 
   var btns = document.querySelectorAll('.tbtn');
   for (var i = 0; i < btns.length; i++) (function (b) {
-    var act = b.getAttribute('data-act'), pid = -1;
+    var act = b.getAttribute('data-act');
+    b._pid = -1;
+    touchBtns.push(b);
     b.addEventListener('pointerdown', function (e) {
       e.preventDefault(); Snd.init();
-      pid = e.pointerId; b.classList.add('on'); actDown(act);
+      if (b._pid !== -1) return; // 이미 다른 손가락이 누르고 있음
+      b._pid = e.pointerId; b.classList.add('on');
+      // 공격 중 Q 버튼: 한 번 누르면 켜짐(다음 스루 = 로빙 스루, 다음 슛 = 감아차기), 다시 누르면 꺼짐
+      if (act === 'mod' && G.mode === 'match' && humanAttacking()) Input.modLatch = !Input.modLatch;
+      actDown(act);
       try { b.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
     });
-    function end(e) { if (e.pointerId !== pid) return; pid = -1; b.classList.remove('on'); actUp(act); }
+    function end(e) { if (e.pointerId !== b._pid) return; b._pid = -1; b.classList.remove('on'); actUp(act); }
     b.addEventListener('pointerup', end);
     b.addEventListener('pointercancel', end);
     b.addEventListener('lostpointercapture', end);
@@ -721,24 +845,81 @@ function setupTouch() {
   var tc = $('touch');
   tc.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
   tc.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+  cv.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
   cv.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
-  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+  // iOS 사파리: 핀치 확대·두 번 탭 확대 막기
+  var noGesture = function (e) { e.preventDefault(); };
+  document.addEventListener('gesturestart', noGesture);
+  document.addEventListener('gesturechange', noGesture);
+  document.addEventListener('gestureend', noGesture);
+  document.addEventListener('dblclick', function (e) { if (!isTyping(e)) e.preventDefault(); }, { passive: false });
+  document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1 && e.cancelable) e.preventDefault(); }, { passive: false });
 }
 function detectTouch() {
-  var coarse = false;
-  try { coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches; } catch (e) { coarse = false; }
-  return coarse || (('ontouchstart' in window) && (navigator.maxTouchPoints || 0) > 0 && !(window.matchMedia && window.matchMedia('(pointer: fine)').matches));
+  // 아이패드 사파리는 맥 UA 를 보내므로 maxTouchPoints 로 판단합니다. 터치가 되는 기기는 (마우스/트랙패드가 있어도) 터치 UI 를 켭니다.
+  var coarse = false, mtp = 0;
+  try { coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { coarse = false; }
+  try { mtp = navigator.maxTouchPoints || navigator.msMaxTouchPoints || 0; } catch (e) { mtp = 0; }
+  return coarse || mtp > 0 || ('ontouchstart' in window);
 }
-var touchLabelsAtk = null;
-function updateTouchLabels() {
+// 사람 팀이 공격 중인가 (우리 공, 또는 우리 패스가 날아가는 중)
+function humanAttacking() {
+  if (!G.human) return false;
+  var t = G.human.team, o = ball.owner;
+  if (o) return o.team === t;
+  return !!(ball.pendingPass === t && ball.passTarget && ball.passTarget.team === t);
+}
+function inCrossZone(p) {
+  return fwdN(p.team, p.x) > 0.7 && Math.abs(p.y - CY) > BOX_W / 2 - 60;
+}
+var TOUCH_LABELS = {
+  atk: { shoot: ['슛', 'D'], pass: ['패스', 'S'], through: ['스루', 'W'], lob: ['로빙', 'A'], sprint: ['질주', 'E'], skill: ['개인기', 'C'], mod: ['Q', '감아·로빙'] },
+  def: { shoot: ['태클', 'D'], pass: ['압박', 'S 길게'], through: ['GK 전진', 'W 길게'], lob: ['슬라이딩', 'A'], sprint: ['질주', 'E'], skill: ['팀원압박', 'C 길게'], mod: ['전환', 'Q'] },
+  sp: { shoot: ['롱킥', 'D'], pass: ['패스', 'S'], through: ['스루', 'W'], lob: ['로빙', 'A'], sprint: ['질주', 'E'], skill: ['개인기', 'C'], mod: ['Q', ''] },
+  ko: { shoot: ['킥오프', 'D'], pass: ['킥오프', 'S'], through: ['킥오프', 'W'], lob: ['킥오프', 'A'], sprint: ['질주', 'E'], skill: ['개인기', 'C'], mod: ['Q', ''] }
+};
+var TOUCH_DIM = { sp: { sprint: 1, skill: 1, mod: 1 }, ko: { sprint: 1, skill: 1, mod: 1, lob: 0 } };
+var touchCtx = null, touchCache = {};
+function setBtnStyle(b, key, prop, val) {
+  var ck = b.id + key;
+  if (touchCache[ck] === val) return;
+  touchCache[ck] = val;
+  b.style.setProperty(prop, val);
+}
+function updateTouchUI() {
   if (!G.touchMode || G.mode !== 'match' || !G.human) return;
-  var atk = !!(ball.owner && ball.owner.team === G.human.team) || G.phase === 'setpiece' || G.phase === 'kickoff';
-  if (atk === touchLabelsAtk) return;
-  touchLabelsAtk = atk;
-  $('tb-pass').textContent = atk ? '패스' : '태클';
-  $('tb-shoot').textContent = atk ? '슛' : '슬라이딩';
-  $('tb-shoot').style.fontSize = atk ? '18px' : '13px';
-  $('tb-through').style.opacity = atk ? '' : '0.4';
+  var H = G.human, p = H.ctrl, ph = G.phase, i, b, act;
+  var ctx2 = (ph === 'kickoff') ? 'ko' : (ph === 'setpiece' && G.sp.team === H.team) ? 'sp' : (humanAttacking() ? 'atk' : 'def');
+  var sub = '';
+  if (ctx2 === 'atk' && ball.owner === p && p && inCrossZone(p)) sub = 'X';
+  if (ctx2 === 'sp' && G.sp.type === 'corner') sub = 'C';
+  if (ctx2 === 'sp' && G.sp.type === 'throw') sub = 'T';
+  if (ctx2 + sub !== touchCtx) {
+    touchCtx = ctx2 + sub;
+    var L = TOUCH_LABELS[ctx2], D = TOUCH_DIM[ctx2] || {};
+    for (i = 0; i < touchBtns.length; i++) {
+      b = touchBtns[i]; act = b.getAttribute('data-act');
+      var lab = L[act][0];
+      if (act === 'lob' && (sub === 'X' || sub === 'C')) lab = '크로스';
+      if (act === 'shoot' && sub === 'C') lab = '강한 크로스';
+      if (act === 'shoot' && sub === 'T') lab = '롱 스로인';
+      b.querySelector('.lb').textContent = lab;
+      b.querySelector('.k').textContent = L[act][1];
+      b.classList.toggle('long', lab.length >= 4);
+      b.classList.toggle('dim', !!D[act]);
+    }
+  }
+  // 쿨타임 · 파워 게이지 · Q 켜짐 표시
+  var bShoot = $('tb-shoot'), bPass = $('tb-pass'), bLob = $('tb-lob'), bSkill = $('tb-skill'), bMod = $('tb-mod');
+  var ch = p ? p.charge : 0, pc = p ? p.passCharge : 0;
+  bShoot.classList.toggle('charging', ch > 0 && ph === 'play');
+  setBtnStyle(bShoot, 'g', '--g', ch.toFixed(2));
+  setBtnStyle(bShoot, 'gc', '--gc', ch < 0.55 ? '#4ade80' : (ch < 0.85 ? '#facc15' : '#ef4444'));
+  bPass.classList.toggle('charging', pc > 0 && ph === 'play');
+  setBtnStyle(bPass, 'g', '--g', pc.toFixed(2));
+  setBtnStyle(bLob, 'c', '--c', (ctx2 === 'def' && p ? clamp(p.slideCd / 1.5, 0, 1) : 0).toFixed(2));
+  setBtnStyle(bSkill, 'c', '--c', (ctx2 === 'atk' && p ? clamp(p.feintCd / FEINT_CD, 0, 1) : 0).toFixed(2));
+  bMod.classList.toggle('latch', Input.modLatch && ctx2 === 'atk');
 }
 
 /* =====================================================================
@@ -763,7 +944,7 @@ function makePlayer(team, f, i) {
     desX: 0, desY: 0, desSprint: false,
     kickCd: 0, tackleCd: 0, stun: 0, slideT: 0, slideCd: 0, slideHit: false, sdx: 0, sdy: 0,
     diveT: 0, diveCd: 0, holding: false, holdT: 0, gkMiss: 0, react: 0, touchCd: 0, headerCd: 0, lungeT: 0,
-    decT: 0, charge: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6
+    decT: 0, charge: 0, passCharge: 0, feintT: 0, feintCd: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6
   };
 }
 // 두 유니폼이 얼마나 잘 구분되는지 (셔츠 색 차이 + 밝기 차이 + 테두리 차이)
@@ -803,7 +984,7 @@ function setupTeams(defA, defB, aiA, aiB, humanA) {
 function resetBall(x, y) {
   var b = ball;
   b.x = x; b.y = y; b.z = 0; b.vx = b.vy = b.vz = 0; b.owner = null; b.kicker = null; b.kickTime = -9;
-  b.passTarget = null; b.pendingPass = null; b.shotBy = null; b.shotOn = false; b.inGoal = 0;
+  b.passTarget = null; b.pendingPass = null; b.shotBy = null; b.shotOn = false; b.inGoal = 0; b.curve = 0; b.curveT = 0;
 }
 
 /* =====================================================================
@@ -825,7 +1006,7 @@ function kickoff(kt) {
     var p = G.players[i];
     kickoffPos(p, p.team === kt, TMP);
     p.x = TMP.x; p.y = TMP.y; p.vx = p.vy = 0; p.fx = p.team.dir; p.fy = 0;
-    p.stun = p.slideT = p.diveT = p.lungeT = 0; p.holding = false; p.charge = 0; p.receiveT = 0; p.desX = p.desY = 0;
+    p.stun = p.slideT = p.diveT = p.lungeT = 0; p.holding = false; p.charge = 0; p.passCharge = 0; p.feintT = 0; p.receiveT = 0; p.desX = p.desY = 0;
   }
   var k = kt.players[6];
   ball.owner = k; ball.lastTouch = k; ball.lastTeam = kt; ball.ownT = G.time;
@@ -902,7 +1083,8 @@ function bestBoxTarget(t, exclude) {
   for (var i = 1; i < t.players.length; i++) {
     var p = t.players[i]; if (p === exclude) continue;
     var d = dist(p.x, p.y, gx - t.dir * PEN_SPOT, CY);
-    var s = -d / 100 + nearestOppDistXY(t, p.x, p.y) / 60 + Math.random() * 0.8;
+    // 멀리 떨어진 '빈' 선수보다 문전에 있는 선수를 고르도록 수비수와의 거리 가산점은 상한을 둡니다
+    var s = -d / 100 + Math.min(nearestOppDistXY(t, p.x, p.y), 110) / 60 + Math.random() * 0.8;
     if (s > bs) { bs = s; best = p; }
   }
   return best || t.players[6];
@@ -1004,10 +1186,16 @@ function steerTo(p, tx, ty, sprint, slowR) {
   p.desSprint = !!sprint;
 }
 // 공 궤적 시뮬레이션 (선을 통과하는 지점 예측)
-function predictAtX(lineX, out) {
+function predictAtX(lineX, out, maxSteps) {
   var x = ball.x, y = ball.y, z = ball.z, vx = ball.vx, vy = ball.vy, vz = ball.vz, h = 1 / 60;
-  for (var i = 0; i < 150; i++) {
+  var cu = ball.curve, ct = ball.curveT, ns0 = maxSteps || 150;
+  for (var i = 0; i < ns0; i++) {
     var px = x;
+    if (ct > 0 && cu) {
+      var cs = Math.sqrt(vx * vx + vy * vy);
+      if (cs > 1) { var cvx = vx; vx += -vy / cs * cu * h; vy += cvx / cs * cu * h; }
+      ct -= h;
+    }
     x += vx * h; y += vy * h;
     if (z > 0 || vz > 0) {
       z += vz * h; vz -= GRAV * h;
@@ -1034,11 +1222,11 @@ function kickBall(p, vx, vy, vz, power) {
   b.vx = vx; b.vy = vy; b.vz = vz;
   if (vz > 0 && b.z < 1) b.z = 1;
   b.kicker = p; b.kickTime = G.time; b.lastTouch = p; b.lastTeam = p.team;
-  b.passTarget = null; b.pendingPass = null; b.shotBy = null; b.shotOn = false;
-  p.fx = vx / sp; p.fy = vy / sp; p.kickCd = 0.3; p.charge = 0;
+  b.passTarget = null; b.pendingPass = null; b.shotBy = null; b.shotOn = false; b.curve = 0; b.curveT = 0;
+  p.fx = vx / sp; p.fy = vy / sp; p.kickCd = 0.3; p.charge = 0; p.passCharge = 0;
   Snd.kick(power === undefined ? 0.5 : power);
 }
-function passTo(p, r, kind, noise) {
+function passTo(p, r, kind, noise, power) {
   var t = p.team;
   var tx = r.x, ty = r.y;
   var tt = dist(p.x, p.y, tx, ty) / 520;
@@ -1057,6 +1245,8 @@ function passTo(p, r, kind, noise) {
     vz = GRAV * (d / v) * 0.35;
   } else {
     v = clamp(FRIC * d + 170 + (kind === 'through' ? 40 : 0), 240, PICKUP_MAX);
+    // 패스 키를 길게 누를수록 더 세게 (받는 선수가 잡을 수 있는 속도까지)
+    if (power) v = Math.min(PICKUP_MAX, v * (1 + power * 0.3));
   }
   v *= 1 + gauss() * noise * 0.4;
   kickBall(p, Math.cos(ang) * v, Math.sin(ang) * v, vz, 0.35 + v / 2200);
@@ -1065,23 +1255,49 @@ function passTo(p, r, kind, noise) {
   if (!G.demo) t.stats.passes++;
   if (G.human && t === G.human.team && r.role !== 'GK') setCtrl(r);
 }
-function shoot(p, power, aimY, noise) {
+function shoot(p, power, aimY, noise, curl) {
   var t = p.team, gx = oppGoalX(t);
   var ang = Math.atan2(aimY - ball.y, gx - ball.x) + gauss() * noise;
   var v = 620 + 560 * power;
   var vz = Math.max(0, (35 + 235 * power * power) * (1 + gauss() * noise * 1.3));
   kickBall(p, Math.cos(ang) * v, Math.sin(ang) * v, vz, 0.7 + power * 0.5);
+  if (curl) curlShot(gx, ang, v);
+  G.dbg.lastCurl = ball.curve;
   ball.shotBy = p; ball.shotX = ball.x; ball.shotY = ball.y;
-  var on = predictAtX(gx, TMP2) && Math.abs(TMP2.y - CY) < GOAL_HALF - 2 && TMP2.z < CROSSBAR;
+  var on = predictAtX(gx, TMP2, 320) && Math.abs(TMP2.y - CY) < GOAL_HALF - 2 && TMP2.z < CROSSBAR;
   ball.shotOn = on;
   if (!G.demo) { t.stats.shots++; if (on) t.stats.onTarget++; }
   if (G.human && t === G.human.team && power > 0.78 && on) toastSoft('강력한 슈팅!', '#fde047');
+}
+// 감아차기: 골대 바깥쪽으로 조금 벌려 찬 뒤, 옆으로 휘는 힘(ball.curve)으로 원래 조준점에 도착하도록 맞춥니다.
+function curlShot(gx, ang, v) {
+  var b = ball, dxg = gx - b.x;
+  if (Math.abs(dxg) < 40 || Math.abs(Math.cos(ang)) < 0.2) return;
+  var yT = b.y + dxg * Math.tan(ang); // 휘지 않았다면 골라인에서 지날 y (목표)
+  var side = yT >= CY ? 1 : -1, th = 0.15;
+  if ((Math.sin(ang + th) - Math.sin(ang)) * side < 0) th = -th; // 골대 바깥쪽으로 벌리는 방향
+  var vx0 = b.vx, vy0 = b.vy;
+  b.vx = Math.cos(ang + th) * v; b.vy = Math.sin(ang + th) * v;
+  b.curveT = 1.6;
+  // 휘는 힘을 훑어 보며 골라인 도착 지점이 목표에 가장 가까운 값을 고르고, 이웃 값 사이를 한 번 더 좁힙니다.
+  var best = null, be = 1e9, bi = 0, ys = [], A_MAX = 1400, A_STEP = 100, i, a, e;
+  for (i = 0, a = -A_MAX; a <= A_MAX; a += A_STEP, i++) {
+    b.curve = a;
+    ys[i] = predictAtX(gx, TMP2, 320) ? TMP2.y : null;
+    if (ys[i] !== null) { e = Math.abs(ys[i] - yT); if (e < be) { be = e; best = a; bi = i; } }
+  }
+  if (best !== null && be < 60) {
+    var nb = (ys[bi + 1] !== undefined && ys[bi + 1] !== null && (ys[bi + 1] - yT) * (ys[bi] - yT) <= 0) ? bi + 1 :
+      ((bi > 0 && ys[bi - 1] !== null && (ys[bi - 1] - yT) * (ys[bi] - yT) <= 0) ? bi - 1 : -1);
+    if (nb >= 0 && ys[nb] !== ys[bi]) best = best + (nb - bi) * A_STEP * (yT - ys[bi]) / (ys[nb] - ys[bi]);
+    b.curve = best;
+  } else { b.vx = vx0; b.vy = vy0; b.curve = 0; b.curveT = 0; }
 }
 function looseBall(from, by, vx, vy) {
   var b = ball;
   b.owner = null; b.vx = vx; b.vy = vy; b.vz = 0; b.z = 0;
   b.kicker = from; b.kickTime = G.time; b.lastTouch = by; b.lastTeam = by.team;
-  b.pendingPass = null; b.shotBy = null; b.passTarget = null;
+  b.pendingPass = null; b.shotBy = null; b.passTarget = null; b.curve = 0; b.curveT = 0;
   from.holding = false;
 }
 function setOwner(p) {
@@ -1092,7 +1308,7 @@ function setOwner(p) {
     b.pendingPass = null;
   }
   b.owner = p; b.lastTouch = p; b.lastTeam = p.team; b.passTarget = null; b.shotBy = null; b.ownT = G.time;
-  b.z = 0; b.vz = 0; b.inGoal = 0;
+  b.z = 0; b.vz = 0; b.inGoal = 0; b.curve = 0; b.curveT = 0;
   p.receiveT = 0; p.decT = p.team.ai.decision * rand(0.35, 0.9); p.dribY = clamp(p.y + rand(-80, 80), 80, PH - 80);
   if (G.human) {
     if (p.team === G.human.team) { if (p.role !== 'GK') setCtrl(p); }
@@ -1101,10 +1317,10 @@ function setOwner(p) {
 }
 function setCtrl(p) {
   if (!G.human || !p) return;
-  if (G.human.ctrl !== p) { if (G.human.ctrl) G.human.ctrl.charge = 0; G.human.ctrl = p; G.human.switchT = 0.8; }
+  if (G.human.ctrl !== p) { if (G.human.ctrl) { G.human.ctrl.charge = 0; G.human.ctrl.passCharge = 0; } G.human.ctrl = p; G.human.switchT = 0.8; }
 }
 function tryTackle(d, c, bonus) {
-  if (c.holding) return false;
+  if (c.holding || c.feintT > 0) return false; // 개인기(탈압박) 중에는 태클이 통하지 않습니다
   var pr = 0.2 + bonus + (d.team.def.def - c.team.def.att) / 180 + (d.team.ai.tackle - 1) * 0.2;
   if (c.desSprint) pr += 0.07;
   // 가만히 서서 공을 끄는 선수는 뺏기기 쉽습니다
@@ -1116,7 +1332,7 @@ function tryTackle(d, c, bonus) {
   if (d.role === 'GK' && inOwnBox(d.team, ball.x, ball.y)) gkCatch(d);
   else if (Math.random() < 0.5) { setOwner(d); ball.kicker = c; ball.kickTime = G.time; }
   else looseBall(c, d, (ball.x - c.x) * 3 + d.fx * 90 + rand(-40, 40), (ball.y - c.y) * 3 + d.fy * 90 + rand(-40, 40));
-  c.stun = 0.3; c.tackleCd = 0.8; c.charge = 0;
+  c.stun = 0.3; c.tackleCd = 0.8; c.charge = 0; c.passCharge = 0;
   if (!G.demo) d.team.stats.tackles++;
   if (G.human && d.team === G.human.team) toastSoft('태클 성공!', '#86efac');
   return true;
@@ -1130,7 +1346,7 @@ function standTackle(p) {
 function startSlide(p, dx, dy) {
   if (p.slideCd > 0 || p.slideT > 0 || p.stun > 0 || p.role === 'GK') return;
   var l = Math.sqrt(dx * dx + dy * dy) || 1;
-  p.sdx = dx / l; p.sdy = dy / l; p.slideT = 0.45; p.slideCd = 1.5; p.slideHit = false;
+  p.sdx = dx / l; p.sdy = dy / l; p.slideT = 0.45; p.slideCd = SLIDE_CD; p.slideHit = false;
   p.fx = p.sdx; p.fy = p.sdy; p.stamina = Math.max(0, p.stamina - 0.04);
 }
 function gkCatch(g) {
@@ -1151,7 +1367,7 @@ function parry(g) {
     if (vx > 8) { b.vx = -dir * vx; b.vy = sy * vy; b.vz = rand(60, 150); }
   }
   b.kicker = g; b.kickTime = G.time; b.lastTouch = g; b.lastTeam = g.team;
-  b.shotBy = null; b.passTarget = null; b.pendingPass = null;
+  b.shotBy = null; b.passTarget = null; b.pendingPass = null; b.curve = 0; b.curveT = 0;
   Snd.kick(0.4);
 }
 function gkContact(g) {
@@ -1184,7 +1400,7 @@ function deflect(p) {
   if (vn < 0) { b.vx -= 1.4 * vn * nx; b.vy -= 1.4 * vn * ny; }
   b.vx = b.vx * 0.55 + rand(-60, 60); b.vy = b.vy * 0.55 + rand(-60, 60); b.vz = Math.max(b.vz, rand(0, 110));
   b.x = p.x + nx * (PR + BR + 1); b.y = p.y + ny * (PR + BR + 1);
-  b.lastTouch = p; b.lastTeam = p.team; p.touchCd = 0.25;
+  b.lastTouch = p; b.lastTeam = p.team; p.touchCd = 0.25; b.curve = 0; b.curveT = 0;
   if (b.shotBy && b.shotBy.team !== p.team) toastSoft('몸으로 막아냅니다!', '#e2e8f0');
   b.shotBy = null;
   Snd.kick(0.3);
@@ -1228,15 +1444,15 @@ function isHumanCtrl(p) {
   var ph = G.phase;
   return !!(G.human && G.human.ctrl === p && (ph === 'play' || ph === 'setpiece' || ph === 'kickoff'));
 }
-function pickReceiver(p, dx, dy, through) {
+function pickReceiver(p, dx, dy, through, power) {
   var t = p.team, l = Math.sqrt(dx * dx + dy * dy) || 1; dx /= l; dy /= l;
-  var best = null, bs = -1e9, fb = null, fbs = -1e9;
+  var best = null, bs = -1e9, fb = null, fbs = -1e9, dw = 900 + (power || 0) * 1200;
   for (var i = 0; i < t.players.length; i++) {
     var r = t.players[i]; if (r === p) continue;
     var rx = r.x - p.x, ry = r.y - p.y, d = Math.sqrt(rx * rx + ry * ry); if (d < 25) continue;
     var c = (rx * dx + ry * dy) / d;
     var lc = laneClear(t, p.x, p.y, r.x, r.y), lane = clamp(lc / 60, 0, 1);
-    var s = c * 2.4 - d / 900 + lane * 1.2 - (lc < 15 ? 1.5 : 0) - (r.role === 'GK' ? 1.3 : 0);
+    var s = c * 2.4 - d / dw + lane * 1.2 - (lc < 15 ? 1.5 : 0) - (r.role === 'GK' ? 1.3 : 0);
     if (through) s += (fwdN(t, r.x) - fwdN(t, p.x)) * 1.5;
     if (c > 0.45 && s > bs) { bs = s; best = r; }
     if (c > 0.1 && s > fbs) { fbs = s; fb = r; }
@@ -1244,48 +1460,85 @@ function pickReceiver(p, dx, dy, through) {
   // 입력 방향과 거의 맞는 동료가 없으면 null → 입력 방향 빈 공간으로 찹니다 (등 뒤로 패스하지 않음)
   return best || fb;
 }
-function humanPass(p, dx, dy, kind) {
+// kind: 'ground'(S 짧은 패스) · 'through'(W 스루) · 'lobthrough'(Q+W 로빙 스루)
+function humanPass(p, dx, dy, kind, power) {
   var t = p.team, noise = 0.03 + (100 - t.def.att) / 100 * 0.03;
-  var r = pickReceiver(p, dx, dy, kind === 'through');
+  power = power || 0;
+  var thr = kind === 'through' || kind === 'lobthrough';
+  var r = pickReceiver(p, dx, dy, thr, power);
   if (!r) {
-    var l = Math.sqrt(dx * dx + dy * dy) || 1, v = kind === 'through' ? 560 : 420;
-    kickBall(p, dx / l * v, dy / l * v, 0, 0.5); ball.pendingPass = t; if (!G.demo) t.stats.passes++;
+    var l = Math.sqrt(dx * dx + dy * dy) || 1, v;
+    if (kind === 'lobthrough') { v = 470; kickBall(p, dx / l * v, dy / l * v, 215, 0.55); }
+    else { v = kind === 'through' ? 560 : 400 + power * 260; kickBall(p, dx / l * v, dy / l * v, 0, 0.5); }
+    ball.pendingPass = t; if (!G.demo) t.stats.passes++;
     return;
   }
-  if (kind === 'through') {
-    var lane = laneClear(t, p.x, p.y, r.x + t.dir * 110, r.y);
-    passTo(p, r, lane < 26 ? 'lobthrough' : 'through', noise);
-  } else passTo(p, r, 'ground', noise);
+  passTo(p, r, kind, kind === 'lobthrough' ? noise * 1.3 : noise, kind === 'ground' ? power : 0);
 }
-function humanShoot(p, ay, mag) {
+// A: 로빙 패스. 상대 진영 측면 끝(바이라인 근처)에서는 문전으로 크로스.
+function humanLob(p, dx, dy) {
+  var t = p.team, noise = 0.04 + (100 - t.def.att) / 100 * 0.04;
+  if (inCrossZone(p)) {
+    passTo(p, bestBoxTarget(t, p), 'cross', noise * 1.2);
+    toastSoft('크로스!', '#e2e8f0');
+    return;
+  }
+  var r = pickReceiver(p, dx, dy, false, 0.7);
+  if (!r) {
+    var l = Math.sqrt(dx * dx + dy * dy) || 1;
+    kickBall(p, dx / l * 470, dy / l * 470, 230, 0.55); ball.pendingPass = t; if (!G.demo) t.stats.passes++;
+    return;
+  }
+  passTo(p, r, 'lob', noise);
+}
+function humanShoot(p, ay, mag, finesse) {
   var t = p.team, power = clamp(p.charge, 0.2, 1), aim;
   if (mag > 0.2 && Math.abs(ay) > 0.25) aim = CY + clamp(ay / Math.max(mag, 0.01), -1, 1) * (GOAL_HALF - 16);
-  else aim = CY + (p.y < CY ? 1 : -1) * GOAL_HALF * 0.45;
+  else aim = CY + (p.y < CY ? 1 : -1) * GOAL_HALF * (finesse ? 0.6 : 0.45); // 방향 입력 없으면 먼 쪽 구석
   var dG = dist(p.x, p.y, oppGoalX(t), CY);
   var noise = 0.03 + (100 - t.def.att) / 100 * 0.08 + (power > 0.85 ? (power - 0.85) * 0.3 : 0) + clamp((dG - 350) / 3000, 0, 0.08);
   if (nearestOppDistXY(t, p.x, p.y) < 30) noise += 0.03;
-  shoot(p, power, aim, noise);
+  if (finesse) {
+    // 감아차기(Q+D): 힘은 약하고 느리지만 정확하게
+    power = 0.2 + (power - 0.2) * 0.7; noise *= 0.5;
+    toastSoft('감아차기!', '#bae6fd');
+  }
+  shoot(p, power, aim, noise, !!finesse);
 }
+// 세트피스: short(S) · lob(A, 코너는 크로스) · through(W) · long(D)
 function humanSetPiece(p, mode, ax, ay, mag) {
   var sp = G.sp, t = p.team;
   var dx = mag > 0.2 ? ax : CX - p.x, dy = mag > 0.2 ? ay : CY - p.y;
   if (mag <= 0.2 && sp.type === 'corner') { dx = (oppGoalX(t) - t.dir * PEN_SPOT) - p.x; dy = CY - p.y; }
+  if (mag <= 0.2 && sp.type !== 'corner' && mode !== 'short') { dx = t.dir; dy = (CY - p.y) / PH; }
   var r, kind, noise = 0.04;
-  if (mode === 'long' && sp.type === 'corner') { r = bestBoxTarget(t, p); kind = 'cross'; noise = 0.07; }
-  else {
-    r = pickReceiver(p, dx, dy, mode !== 'short');
-    kind = mode === 'short' ? (sp.type === 'throw' ? 'throw' : 'ground') : (sp.type === 'throw' ? 'throw' : 'lob');
-  }
+  if (sp.type === 'corner' && (mode === 'lob' || mode === 'long')) { r = bestBoxTarget(t, p); kind = 'cross'; noise = mode === 'long' ? 0.08 : 0.06; }
+  else if (sp.type === 'throw') { r = pickReceiver(p, dx, dy, mode !== 'short', mode === 'long' ? 1 : 0); kind = 'throw'; }
+  else if (mode === 'short') { r = pickReceiver(p, dx, dy, false, 0); kind = 'ground'; }
+  else if (mode === 'through') { r = pickReceiver(p, dx, dy, true, 0); kind = 'through'; }
+  else { r = pickReceiver(p, dx, dy, mode === 'long', mode === 'long' ? 1.5 : 0.7); kind = 'lob'; }
   if (!r) r = nearestTeammate(p);
   takeSetPiece(p, r, kind, noise);
 }
+// C: 개인기 · 탈압박 (짧은 순간 가속 + 잠깐 태클 면역)
+function doFeint(p, dx, dy) {
+  if (p.feintCd > 0 || p.stun > 0) return false;
+  p.feintT = FEINT_T; p.feintCd = FEINT_CD;
+  p.stamina = Math.max(0, p.stamina - 0.03);
+  var l = Math.sqrt(dx * dx + dy * dy) || 1;
+  p.vx += dx / l * 70; p.vy += dy / l * 70;
+  toastSoft('개인기!', '#f9a8d4');
+  return true;
+}
 function humanStep(dt) {
   var H = G.human, t = H.team, ph = G.phase;
-  // 슛 충전은 인플레이 중에만 유효 (아웃·골·세트피스로 바뀌면 취소)
-  if (ph !== 'play' && H.ctrl) H.ctrl.charge = 0;
+  // 슛/패스 충전은 인플레이 중에만 유효 (아웃·골·세트피스로 바뀌면 취소)
+  if (ph !== 'play' && H.ctrl) { H.ctrl.charge = 0; H.ctrl.passCharge = 0; }
+  H.gkRush = false; H.teamPress = false; H.containing = false;
   if (ph !== 'play' && ph !== 'setpiece' && ph !== 'kickoff') return;
   H.switchT -= dt;
   var p = H.ctrl;
+  var atk = humanAttacking();
   if (ph === 'play') {
     if (ball.owner && ball.owner.team === t) {
       if (ball.owner !== p && ball.owner.role !== 'GK') { setCtrl(ball.owner); p = H.ctrl; }
@@ -1300,11 +1553,14 @@ function humanStep(dt) {
       }
       H.forceSwitch = false;
     }
-    if (Input.pressed.sw && ball.owner !== p) {
+    // Q: 수비 중에는 선수 전환 (공격 중에는 로빙 스루·감아차기 보조 키)
+    if (Input.pressed.mod && !atk && ball.owner !== p) {
       var q = nearestToBall(t, true, p);
       if (q) { setCtrl(q); p = q; }
     }
   }
+  if (!atk) Input.modLatch = false;
+  var mod = Input.held.mod || Input.modLatch;
   var ax = Input.ax, ay = Input.ay, mag = Math.sqrt(ax * ax + ay * ay);
   var hasBall = ball.owner === p;
   p.desX = 0; p.desY = 0; p.desSprint = Input.held.sprint;
@@ -1312,41 +1568,65 @@ function humanStep(dt) {
     if (mag > 0.2 && ph === 'setpiece') { p.fx = ax / mag; p.fy = ay / mag; }
     if (G.phaseT > 0.35) {
       if (ph === 'kickoff') {
-        if (Input.pressed.pass || Input.pressed.through || Input.pressed.shoot) doKickoffPass(p);
+        if (Input.pressed.pass || Input.pressed.lob || Input.pressed.through || Input.pressed.shoot) doKickoffPass(p);
       } else if (Input.pressed.pass) humanSetPiece(p, 'short', ax, ay, mag);
-      else if (Input.pressed.through) humanSetPiece(p, 'lob', ax, ay, mag);
+      else if (Input.pressed.lob) humanSetPiece(p, 'lob', ax, ay, mag);
+      else if (Input.pressed.through) humanSetPiece(p, 'through', ax, ay, mag);
       else if (Input.pressed.shoot) humanSetPiece(p, 'long', ax, ay, mag);
     }
     return;
   }
   if (ph === 'kickoff') return;
-  if (p.stun > 0 || p.slideT > 0 || p.diveT > 0) return;
-  if (mag > 0.15) { p.desX = ax; p.desY = ay; }
+  // 수비 보조 동작(누르고 있는 동안): C 팀원 압박, W 골키퍼 전진 — 조작 선수가 넘어져 있어도 유지
+  var oppBall = !!(ball.owner && ball.owner.team !== t);
+  if (ph === 'play' && !atk) {
+    H.teamPress = Input.held.skill && oppBall;
+    H.gkRush = Input.held.through;
+  }
+  if (p.stun > 0 || p.slideT > 0 || p.diveT > 0) { p.passCharge = 0; return; }
+  // S 누르고 있기(수비): 공 가진 상대와 우리 골대 사이로 따라붙어 견제하고, 붙으면 스탠딩 태클
+  var contain = !hasBall && Input.held.pass && oppBall && !ball.owner.holding && ph === 'play';
+  if (contain) {
+    var c = ball.owner, gx = ownGoalX(t), gdx = gx - c.x, gdy = CY - c.y, gl = Math.sqrt(gdx * gdx + gdy * gdy) || 1;
+    var dd = dist(p.x, p.y, c.x, c.y), tx = c.x + c.vx * 0.15, ty = c.y + c.vy * 0.15;
+    if (dd > 42) { tx += gdx / gl * 24; ty += gdy / gl * 24; } else { tx = ball.x; ty = ball.y; }
+    steerTo(p, tx, ty, Input.held.sprint, 6);
+    H.containing = true;
+    if (dist(p.x, p.y, ball.x, ball.y) < PR + BR + 16) standTackle(p);
+  }
+  else if (mag > 0.15) { p.desX = ax; p.desY = ay; }
   else if (!ball.owner && ball.passTarget === p) { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, Input.held.sprint, 16); }
-  else if (!hasBall && Input.held.pass && ball.owner && ball.owner.team !== t) { steerTo(p, ball.x, ball.y, Input.held.sprint, 8); }
-  // 떠 있는 공(상대 패스·튕겨 나온 공)도 J/패스 버튼을 누르고 있으면 공이 올 곳으로 달려갑니다.
+  // 떠 있는 공(상대 패스·튕겨 나온 공)도 S 를 누르고 있으면 공이 올 곳으로 달려갑니다.
   else if (!hasBall && Input.held.pass && !ball.owner && ph === 'play') { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, Input.held.sprint, 8); }
   if (ph !== 'play') return;
-  // K 를 떼는 순간을 놓친 경우(키 입력 유실 등) 남아 있는 충전 취소
+  // 떼는 순간을 놓친 경우(키 입력 유실 등) 남아 있는 충전 취소
   if (p.charge > 0 && !Input.held.shoot && !Input.released.shoot) p.charge = 0;
+  if (p.passCharge > 0 && !Input.held.pass && !Input.released.pass) p.passCharge = 0;
   if (hasBall) {
     var dx = mag > 0.15 ? ax : p.fx, dy = mag > 0.15 ? ay : p.fy;
-    if (Input.pressed.pass) humanPass(p, dx, dy, 'ground');
-    else if (Input.pressed.through) humanPass(p, dx, dy, 'through');
-    else {
-      if (Input.pressed.shoot) p.charge = 0.02;
-      if (p.charge > 0 && Input.held.shoot) p.charge = Math.min(1, p.charge + dt / 0.9);
-      if (Input.released.shoot && p.charge > 0) humanShoot(p, ay, mag);
-    }
+    if (Input.pressed.skill) doFeint(p, dx, dy);
+    // S: 누르는 동안 패스 세기 충전, 떼면 패스
+    if (Input.pressed.pass) { p.passCharge = 0.02; p.charge = 0; }
+    if (p.passCharge > 0 && Input.held.pass) p.passCharge = Math.min(1, p.passCharge + dt / 0.8);
+    if (Input.released.pass && p.passCharge > 0) { humanPass(p, dx, dy, 'ground', p.passCharge); return; }
+    if (Input.pressed.lob) { p.passCharge = 0; humanLob(p, dx, dy); return; }
+    if (Input.pressed.through) { p.passCharge = 0; humanPass(p, dx, dy, mod ? 'lobthrough' : 'through', 0); Input.modLatch = false; return; }
+    if (p.passCharge > 0) return;
+    // D: 누르는 동안 슛 파워 충전, 떼면 슛 (Q 와 함께 = 감아차기)
+    if (Input.pressed.shoot) p.charge = 0.02;
+    if (p.charge > 0 && Input.held.shoot) p.charge = Math.min(1, p.charge + dt / 0.9);
+    if (Input.released.shoot && p.charge > 0) { humanShoot(p, ay, mag, mod); Input.modLatch = false; }
   } else {
+    p.passCharge = 0;
     if (Input.pressed.shoot) {
       var db = dist(p.x, p.y, ball.x, ball.y);
-      if (!ball.owner && db < 60) p.charge = 0.02;
-      else if (!(ball.owner && ball.owner.team === t)) startSlide(p, mag > 0.15 ? ax : ball.x - p.x, mag > 0.15 ? ay : ball.y - p.y);
+      if (!ball.owner && db < 60) p.charge = 0.02; // 떠 있는 공 근처: 슛 충전 (공을 잡는 순간 떼면 슛)
+      else if (oppBall) standTackle(p);            // D: 스탠딩 태클
     }
     if (p.charge > 0 && Input.held.shoot) p.charge = Math.min(1, p.charge + dt / 0.9);
     if (Input.released.shoot) p.charge = 0;
-    if (Input.pressed.pass && ball.owner && ball.owner.team !== t) standTackle(p);
+    // A: 슬라이딩 태클 (쿨타임)
+    if (Input.pressed.lob && !atk) startSlide(p, mag > 0.15 ? ax : ball.x - p.x, mag > 0.15 ? ay : ball.y - p.y);
   }
 }
 
@@ -1370,6 +1650,8 @@ function teamPrecompute() {
     } else if (ball.owner.team !== t && !ball.owner.holding) {
       var n = t.ai.pressers;
       if (hc) n = hd > 130 ? 1 : 0;
+      // C 누르고 있기: 동료 한 명이 더 압박에 가담
+      if (hc && G.human.teamPress) n = hd > 130 ? 2 : 1;
       if (n > 0) {
         var b1 = 1e9, b2 = 1e9;
         for (i = 1; i < t.players.length; i++) {
@@ -1581,6 +1863,11 @@ function aiGK(p, dt) {
     }
   }
   p.react = 0;
+  // W 누르고 있기(수비): 골키퍼가 공 쪽으로 전진
+  if (G.phase === 'play' && G.human && G.human.team === t && G.human.gkRush && !(b.owner && b.owner.team === t)) {
+    if (b.owner) steerTo(p, b.x, b.y, true, 4); else { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, true, 5); }
+    return;
+  }
   if (G.phase === 'play' && !b.owner && inOwnBox(t, b.x, b.y) && b.z < 50) {
     interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, true, 5); return;
   }
@@ -1643,19 +1930,21 @@ function movePlayer(p, dt) {
   if (p.diveCd > 0) p.diveCd -= dt;
   if (p.lungeT > 0) p.lungeT -= dt;
   if (p.receiveT > 0) p.receiveT -= dt;
+  if (p.feintT > 0) p.feintT -= dt;
+  if (p.feintCd > 0) p.feintCd -= dt;
   var spd;
   if (p.slideT > 0) {
     p.slideT -= dt;
     var s = 150 + 300 * clamp(p.slideT / 0.45, 0, 1);
     p.vx = p.sdx * s; p.vy = p.sdy * s;
-    if (!p.slideHit && ball.owner && ball.owner.team !== p.team && !ball.owner.holding && ball.z < 14 &&
+    if (!p.slideHit && ball.owner && ball.owner.team !== p.team && !ball.owner.holding && !(ball.owner.feintT > 0) && ball.z < 14 &&
         dist(p.x, p.y, ball.x, ball.y) < PR + BR + 8) {
       p.slideHit = true;
       var c = ball.owner;
       var pr = clamp(0.72 + (p.team.def.def - c.team.def.att) / 150 + (p.team.ai.tackle - 1) * 0.15, 0.3, 0.92);
       if (Math.random() < pr) {
         looseBall(c, p, p.sdx * 260 + rand(-60, 60), p.sdy * 260 + rand(-60, 60));
-        c.stun = 0.6; c.charge = 0;
+        c.stun = 0.6; c.charge = 0; c.passCharge = 0;
         if (!G.demo) p.team.stats.tackles++;
         if (G.human && p.team === G.human.team) toastSoft('슬라이딩 태클 성공!', '#86efac');
         Snd.kick(0.35);
@@ -1677,7 +1966,8 @@ function movePlayer(p, dt) {
     var sprinting = p.desSprint && p.stamina > 0.02 && m > 0.3;
     var max = p.speed * p.team.ai.speed * sf * (sprinting ? SPRINT_MUL : 1) * (ball.owner === p ? 0.9 : 1);
     if (p.lungeT > 0) max *= 1.5;
-    var tvx = dxn * max, tvy = dyn * max, acc = ball.owner === p ? 7 : 9;
+    if (p.feintT > 0) max *= 1.45;
+    var tvx = dxn * max, tvy = dyn * max, acc = ball.owner === p ? (p.feintT > 0 ? 14 : 7) : 9;
     var k = Math.min(1, acc * dt);
     p.vx += (tvx - p.vx) * k; p.vy += (tvy - p.vy) * k;
     spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
@@ -1747,6 +2037,12 @@ function updateBall(dt) {
   var n = Math.max(1, Math.ceil(sp * dt / 5)), h = dt / n;
   for (var i = 0; i < n; i++) {
     var px = b.x;
+    if (b.curveT > 0 && b.curve) {
+      // 감아차기: 진행 방향에 수직으로 휘는 힘
+      var cs = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+      if (cs > 1) { var cvx = b.vx; b.vx += -b.vy / cs * b.curve * h; b.vy += cvx / cs * b.curve * h; }
+      b.curveT -= h;
+    }
     b.x += b.vx * h; b.y += b.vy * h;
     if (b.z > 0 || b.vz > 0) {
       b.z += b.vz * h; b.vz -= GRAV * h;
@@ -1785,7 +2081,7 @@ function goalFrame(prevX) {
         b.x = lx + nx * rr; b.y = py + ny * rr;
         var vn = b.vx * nx + b.vy * ny;
         if (vn < 0) {
-          b.vx -= 1.6 * vn * nx; b.vy -= 1.6 * vn * ny;
+          b.vx -= 1.6 * vn * nx; b.vy -= 1.6 * vn * ny; b.curve = 0; b.curveT = 0;
           if (-vn > 220 && G.time - b.lastPostT > 0.5) { b.lastPostT = G.time; toast('골대 강타!', '#fca5a5'); Snd.post(); }
         }
       }
@@ -1927,8 +2223,9 @@ function step(dt) {
   clearEdges();
 }
 function clearEdges() {
-  Input.pressed.pass = Input.pressed.shoot = Input.pressed.through = Input.pressed.sw = false;
-  Input.released.shoot = false;
+  var k;
+  for (k in Input.pressed) if (Input.pressed.hasOwnProperty(k)) Input.pressed[k] = false;
+  for (k in Input.released) if (Input.released.hasOwnProperty(k)) Input.released[k] = false;
 }
 
 /* =====================================================================
@@ -1936,7 +2233,7 @@ function clearEdges() {
  * ===================================================================== */
 var cv = $('cv'), ctx = cv.getContext('2d');
 var view = { w: 800, h: 600, dpr: 1 };
-var cam = { x: CX, y: CY, zoom: 1, portrait: false, lead: 0 };
+var cam = { x: CX, y: CY, zoom: 1, portrait: false, lead: 0, ay: 300 };
 var PORTRAIT_VIEW_W = 820;
 var safe = { t: 0, r: 0, b: 0, l: 0 }; // 노치·홈 인디케이터 영역 (CSS env(safe-area-inset-*))
 function readSafeArea() {
@@ -1964,8 +2261,16 @@ function resize() {
   var jb = $('joyBase');
   if (jb && !Input.joy.active) jb.style.left = jb.style.top = jb.style.bottom = '';
 }
+// 세로 태블릿/휴대폰 터치 화면: 오른쪽 아래 버튼 묶음이 경기장 아래쪽을 가리므로, 그 위 영역을 기준으로 화면 중심을 잡습니다.
+function viewInsetB() {
+  if (!(G.touchMode && G.mode === 'match' && cam.portrait)) return 0;
+  var u = clamp(Math.min(view.w, view.h) * 0.115, 56, 108);
+  return Math.min(view.h * 0.32, u * 3.45 + 10 + safe.b);
+}
 function updateCamera(dt) {
-  var vw = view.w / cam.zoom, vh = view.h / cam.zoom;
+  var inset = viewInsetB();
+  cam.ay = (view.h - inset) / 2;
+  var vw = view.w / cam.zoom, vh = (view.h - inset) / cam.zoom;
   // 공을 가진(마지막으로 만진) 팀의 공격 방향으로 화면을 앞당겨 패스·슛 대상이 보이게 합니다.
   var lt = ball.owner ? ball.owner.team : ball.lastTeam, lead = 0;
   if (lt && (G.phase === 'play' || G.phase === 'setpiece' || G.phase === 'kickoff')) lead = lt.dir * vw * (cam.portrait ? 0.2 : 0.07);
@@ -2188,7 +2493,7 @@ function fmtClock() {
 }
 function drawHUD() {
   var W = view.w, H = view.h, A = G.teams[0], B = G.teams[1];
-  var sc = W < 520 ? 0.82 : 1;
+  var sc = W < 520 ? 0.82 : (Math.min(W, H) >= 700 ? 1.15 : 1);
   ctx.save(); ctx.translate(10 + safe.l, 10 + safe.t); ctx.scale(sc, sc);
   rrect(0, 0, 300, 40, 10); ctx.fillStyle = 'rgba(6,14,10,0.84)'; ctx.fill();
   ctx.fillStyle = A.kit.shirt; ctx.fillRect(8, 9, 7, 22); ctx.fillStyle = A.kit.trim; ctx.fillRect(15, 9, 3, 22);
@@ -2207,8 +2512,9 @@ function drawHUD() {
 
   // 미니맵
   // 화면의 짧은 쪽 길이에 맞춰 크기를 정해, 가로 휴대폰에서 경기 화면을 너무 가리지 않게 합니다.
-  var mw = Math.min(210, W * 0.34, H * (H < 450 ? 0.3 : 0.4)), mh = mw * PH / PW, mx = (W - mw) / 2, my = H - mh - 10 - safe.b;
-  if (G.touchMode) { mx = W - mw - 10 - safe.r; my = 60 + safe.t; }
+  var mw = Math.min(Math.min(W, H) >= 700 ? 240 : 210, W * 0.34, H * (H < 450 ? 0.3 : 0.4)), mh = mw * PH / PW, mx = (W - mw) / 2, my = H - mh - 10 - safe.b;
+  // 터치 화면: 오른쪽 위 (일시정지·소리 버튼 아래). 아래쪽은 조이스틱·버튼 자리
+  if (G.touchMode) { mx = W - mw - 10 - safe.r; my = 70 + safe.t; }
   var s = mw / PW;
   ctx.fillStyle = G.touchMode ? 'rgba(20,83,45,0.5)' : 'rgba(20,83,45,0.72)'; ctx.fillRect(mx, my, mw, mh);
   ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1;
@@ -2220,7 +2526,8 @@ function drawHUD() {
   ctx.strokeStyle = 'rgba(255,255,255,0.28)';
   // 카메라는 경기장 밖(VIEW_OUT_X/Y)까지 보여 줄 수 있으므로, 시야 사각형의 양 끝을 각각 미니맵 안으로 자릅니다.
   var vx0 = clamp((cam.x - vw / 2) * s, 0, mw), vx1 = clamp((cam.x + vw / 2) * s, 0, mw);
-  var vy0 = clamp((cam.y - vh / 2) * s, 0, mh), vy1 = clamp((cam.y + vh / 2) * s, 0, mh);
+  var cay = G.mode === 'match' ? cam.ay : view.h / 2;
+  var vy0 = clamp((cam.y - cay / cam.zoom) * s, 0, mh), vy1 = clamp((cam.y + (view.h - cay) / cam.zoom) * s, 0, mh);
   ctx.strokeRect(mx + vx0, my + vy0, vx1 - vx0, vy1 - vy0);
   for (var i = 0; i < G.players.length; i++) {
     var p = G.players[i], isC = G.human && p === G.human.ctrl;
@@ -2258,8 +2565,8 @@ function drawHUD() {
   }
   // 안내
   var hint = '';
-  if (G.phase === 'kickoff' && G.human && ball.owner === G.human.ctrl) hint = G.touchMode ? '패스 버튼으로 킥오프' : 'Space / J 를 눌러 킥오프';
-  else if (G.phase === 'setpiece' && G.human && G.sp.taker === G.human.ctrl) hint = G.touchMode ? '패스: 짧게 · 스루: 로빙 · 슛: 롱킥/크로스' : '방향 조준 · J 짧은 패스 · I 로빙 · K 롱킥/크로스';
+  if (G.phase === 'kickoff' && G.human && ball.owner === G.human.ctrl) hint = G.touchMode ? '킥오프 버튼을 누르세요' : 'S / Space 를 눌러 킥오프';
+  else if (G.phase === 'setpiece' && G.human && G.sp.taker === G.human.ctrl) hint = G.touchMode ? '조이스틱 조준 · 패스 · 로빙/크로스 · 스루 · 롱킥' : '방향 조준 · S 짧은 패스 · A 로빙/크로스 · W 스루 · D 롱킥';
   if (hint) {
     ctx.font = '800 15px "Noto Sans KR", sans-serif';
     var tw = ctx.measureText(hint).width + 28, hy = G.touchMode ? H * 0.3 : H - mh - 34;
@@ -2269,10 +2576,13 @@ function drawHUD() {
   if (!G.touchMode && G.matchT < 12 && G.half === 1) {
     ctx.globalAlpha = clamp((12 - G.matchT) / 2, 0, 1) * 0.9;
     ctx.font = '700 12px "Noto Sans KR", sans-serif'; ctx.textAlign = 'left';
-    var lines = ['방향키/WASD 이동 · Shift 스프린트', 'Space/J 패스 · K 슛(길게) · I 스루 · Q 전환', '수비: J 태클 · K 슬라이딩 · Esc 일시정지'];
-    rrect(10, H - 74, 290, 64, 10); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
+    var lines = ['방향키 이동 · E 질주 · S 패스 · A 로빙/크로스 · W 스루 · D 슛(길게)', 'Q+W 로빙 스루 · Q+D 감아차기 · C 개인기 · Esc 일시정지',
+      '수비: Q 전환 · S 압박 · D 태클 · A 슬라이딩 · C 팀원압박 · W GK 전진'];
+    var lw = 0; for (var lj = 0; lj < lines.length; lj++) lw = Math.max(lw, ctx.measureText(lines[lj]).width);
+    var hx = 10 + safe.l, hy2 = 10 + safe.t + 40 * sc + 8;
+    rrect(hx, hy2, lw + 20, 64, 10); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
     ctx.fillStyle = '#e2e8f0';
-    for (var li = 0; li < lines.length; li++) ctx.fillText(lines[li], 20, H - 58 + li * 19);
+    for (var li = 0; li < lines.length; li++) ctx.fillText(lines[li], hx + 10, hy2 + 14 + li * 19);
     ctx.globalAlpha = 1;
   }
 }
@@ -2280,7 +2590,7 @@ function render() {
   var W = view.w, H = view.h, d = view.dpr, z = cam.zoom;
   ctx.setTransform(d, 0, 0, d, 0, 0);
   ctx.fillStyle = '#18202e'; ctx.fillRect(0, 0, W, H);
-  ctx.setTransform(d * z, 0, 0, d * z, d * (W / 2 - cam.x * z), d * (H / 2 - cam.y * z));
+  ctx.setTransform(d * z, 0, 0, d * z, d * (W / 2 - cam.x * z), d * ((G.mode === 'match' ? cam.ay : H / 2) - cam.y * z));
   drawWorld();
   ctx.setTransform(d, 0, 0, d, 0, 0);
   if (G.mode === 'match' || G.mode === 'result') drawHUD();
@@ -2289,13 +2599,13 @@ function render() {
 /* =====================================================================
  * 14. 루프 · 일시정지
  * ===================================================================== */
-var lastT = 0, acc = 0, errLogged = false;
+var lastT = 0, acc = 0, errLogged = false, frozen = false; // frozen: 테스트용 (실시간 진행 멈춤)
 function frame(now) {
   requestAnimationFrame(frame);
   try {
     var dt = lastT ? (now - lastT) / 1000 : 0; lastT = now;
     if (dt > 0.1) dt = 0.1; if (dt < 0) dt = 0;
-    var running = !G.paused && !document.hidden && (G.mode === 'match' || G.mode === 'menu');
+    var running = !frozen && !G.paused && !document.hidden && (G.mode === 'match' || G.mode === 'menu');
     if (running) {
       var scale = 1;
       if (G.slowT > 0) { G.slowT -= dt; scale = 0.35; }
@@ -2305,7 +2615,7 @@ function frame(now) {
       if (n >= 5) acc = 0;
     }
     render();
-    updateTouchLabels();
+    updateTouchUI();
   } catch (err) {
     if (!errLogged) { errLogged = true; console.error('[성모 사커] 게임 루프 오류:', err); }
   }
@@ -2473,8 +2783,7 @@ function startMatch(cfg) {
   resetInput();
   show(null);
   $('topbar').classList.remove('hidden');
-  $('touch').classList.toggle('hidden', !G.touchMode);
-  touchLabelsAtk = null;
+  setTouchMode(G.touchMode);
   kickoff(G.firstKick);
   cam.x = CX; cam.y = CY; cam.lead = 0;
   Snd.crowdStart();
@@ -2668,10 +2977,7 @@ function bindUI() {
   });
   window.addEventListener('pointerdown', function (e) {
     Snd.init();
-    if (e.pointerType === 'touch' && !G.touchMode) {
-      G.touchMode = true;
-      if (G.mode === 'match') $('touch').classList.remove('hidden');
-    }
+    if (e.pointerType === 'touch' && !G.touchMode) setTouchMode(true);
   }, true);
 }
 
@@ -2679,7 +2985,7 @@ function bindUI() {
  * 17. 시작
  * ===================================================================== */
 function boot() {
-  G.touchMode = detectTouch();
+  setTouchMode(detectTouch());
   resize();
   makeCrowd();
   bindUI();
@@ -2707,7 +3013,12 @@ window.__game = {
   },
   skipClock: function (left) { G.clock = Math.max(0, G.halfLen - left); },
   sim: function (sec) { var n = Math.round(sec / STEP); for (var i = 0; i < n; i++) step(STEP); return this.state; },
-  start: function (cfg) { startMatch(cfg || { my: 0, opp: 1, diff: '보통', min: 2, nick: '테스트' }); }
+  start: function (cfg) { startMatch(cfg || { my: 0, opp: 1, diff: '보통', min: 2, nick: '테스트' }); },
+  Input: Input, cam: cam,
+  give: function (p) { setOwner(p); },
+  step: function (n) { for (var i = 0; i < (n || 1); i++) step(STEP); return this.state; },
+  setTouchMode: function (v) { setTouchMode(v); },
+  freeze: function (v) { frozen = !!v; }
 };
 
 try { boot(); } catch (e) { console.error('[성모 사커] 초기화 실패:', e); }

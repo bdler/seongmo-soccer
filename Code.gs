@@ -38,6 +38,10 @@ function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('성모 사커')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover')
+    // 태블릿/휴대폰에서 '홈 화면에 추가'로 열 때 주소창 없이 전체 화면처럼 보이도록
+    .addMetaTag('mobile-web-app-capable', 'yes')
+    .addMetaTag('apple-mobile-web-app-capable', 'yes')
+    .addMetaTag('apple-mobile-web-app-title', '성모 사커')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
