@@ -1960,6 +1960,9 @@ function resize() {
   if (cam.portrait) cam.zoom = clamp(w / PORTRAIT_VIEW_W, 0.42, 1.2);
   else cam.zoom = clamp(Math.sqrt(w * h / (980 * 600)), 0.5, 1.7);
   readSafeArea();
+  // 화면 회전 등으로 조이스틱 영역 크기가 바뀌면, 마지막 터치 위치에 남아 있던 받침이 화면 밖에 놓일 수 있으므로 기본 위치로 되돌립니다.
+  var jb = $('joyBase');
+  if (jb && !Input.joy.active) jb.style.left = jb.style.top = jb.style.bottom = '';
 }
 function updateCamera(dt) {
   var vw = view.w / cam.zoom, vh = view.h / cam.zoom;
@@ -2215,7 +2218,10 @@ function drawHUD() {
   ctx.strokeRect(mx + mw - BOX_D * s, my + (CY - BOX_W / 2) * s, BOX_D * s, BOX_W * s);
   var vw = view.w / cam.zoom, vh = view.h / cam.zoom;
   ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-  ctx.strokeRect(mx + clamp((cam.x - vw / 2) * s, 0, mw), my + clamp((cam.y - vh / 2) * s, 0, mh), Math.min(mw, vw * s), Math.min(mh, vh * s));
+  // 카메라는 경기장 밖(VIEW_OUT_X/Y)까지 보여 줄 수 있으므로, 시야 사각형의 양 끝을 각각 미니맵 안으로 자릅니다.
+  var vx0 = clamp((cam.x - vw / 2) * s, 0, mw), vx1 = clamp((cam.x + vw / 2) * s, 0, mw);
+  var vy0 = clamp((cam.y - vh / 2) * s, 0, mh), vy1 = clamp((cam.y + vh / 2) * s, 0, mh);
+  ctx.strokeRect(mx + vx0, my + vy0, vx1 - vx0, vy1 - vy0);
   for (var i = 0; i < G.players.length; i++) {
     var p = G.players[i], isC = G.human && p === G.human.ctrl;
     ctx.fillStyle = p.role === 'GK' ? p.team.kit.gk : p.team.kit.shirt;
