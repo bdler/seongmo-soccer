@@ -340,7 +340,8 @@ body.touch .icon-btn svg{width:26px;height:26px}
     </div>
     <ul class="tips">
       <li>슛은 방향키(조이스틱) 위/아래로 골대 안쪽을 조준합니다. 너무 세게 차면 공이 뜹니다!</li>
-      <li>패스는 입력한 방향의 동료에게 자동으로 연결됩니다. 방향 입력이 없으면 바라보는 방향으로 찹니다.</li>
+      <li>패스는 입력한 방향의 동료 중 받기 좋은 선수에게 알맞은 세기로 연결됩니다(패스 어시스트). 방향 입력이 없으면 바라보는 방향으로 찹니다.</li>
+      <li>패스하면 받는 선수로 조작이 자동으로 넘어가고, 방향키를 떼고 있으면 공이 올 곳(하늘색 링)으로 알아서 마중 나갑니다.</li>
       <li>스태미나가 떨어지면 느려집니다. 질주는 아껴 쓰세요.</li>
     </ul>
   </div>
@@ -474,15 +475,15 @@ var CORNER_SPOTS = [[0.93, 0.45], [0.90, 0.57], [0.87, 0.49], [0.84, 0.37], [0.8
 
 // 난이도별 AI 파라미터 (CPU 팀에 적용)
 var DIFFS = {
-  '쉬움':   { speed: 0.88, decision: 0.50, passNoise: 0.13, shotNoise: 0.15, tackle: 0.75, gkReact: 0.20, gkSave: 0.55, pressers: 1, tackleCd: 1.05, aggression: 0.5 },
-  '보통':   { speed: 0.97, decision: 0.32, passNoise: 0.075, shotNoise: 0.095, tackle: 1.0, gkReact: 0.16, gkSave: 0.65, pressers: 1, tackleCd: 0.8, aggression: 0.8 },
-  '어려움': { speed: 1.05, decision: 0.20, passNoise: 0.04, shotNoise: 0.06, tackle: 1.22, gkReact: 0.12, gkSave: 0.75, pressers: 2, tackleCd: 0.6, aggression: 1.0 }
+  '쉬움':   { speed: 0.88, decision: 0.50, passNoise: 0.11, shotNoise: 0.15, tackle: 0.75, gkReact: 0.20, gkSave: 0.55, pressers: 1, tackleCd: 1.05, aggression: 0.5 },
+  '보통':   { speed: 0.97, decision: 0.32, passNoise: 0.06, shotNoise: 0.095, tackle: 1.0, gkReact: 0.16, gkSave: 0.65, pressers: 1, tackleCd: 0.8, aggression: 0.8 },
+  '어려움': { speed: 1.05, decision: 0.20, passNoise: 0.035, shotNoise: 0.06, tackle: 1.22, gkReact: 0.12, gkSave: 0.75, pressers: 2, tackleCd: 0.6, aggression: 1.0 }
 };
 var GK_SHUFFLE = 0.55; // 반응 시간 동안 골키퍼 옆걸음 속도 비율
 var PARRY_WIDE = 0.4;  // 쳐낸 공이 골대 옆(코너킥)으로 나가는 비율
 // 사람 팀의 AI 동료
-var ALLY_AI = { speed: 1.0, decision: 0.3, passNoise: 0.06, shotNoise: 0.08, tackle: 1.0, gkReact: 0.15, gkSave: 0.68, pressers: 1, tackleCd: 0.75, aggression: 0.7 };
-var DEMO_AI = { speed: 0.97, decision: 0.3, passNoise: 0.07, shotNoise: 0.09, tackle: 1.0, gkReact: 0.16, gkSave: 0.66, pressers: 1, tackleCd: 0.8, aggression: 0.7 };
+var ALLY_AI = { speed: 1.0, decision: 0.3, passNoise: 0.05, shotNoise: 0.08, tackle: 1.0, gkReact: 0.15, gkSave: 0.68, pressers: 1, tackleCd: 0.75, aggression: 0.7 };
+var DEMO_AI = { speed: 0.97, decision: 0.3, passNoise: 0.06, shotNoise: 0.09, tackle: 1.0, gkReact: 0.16, gkSave: 0.66, pressers: 1, tackleCd: 0.8, aggression: 0.7 };
 var DIFF_MULT = { '쉬움': 1, '보통': 1.5, '어려움': 2 };
 
 function computeScore(gf, ga, diff) {
@@ -509,7 +510,7 @@ var G = {
 var ball = {
   x: CX, y: CY, z: 0, vx: 0, vy: 0, vz: 0, owner: null, kicker: null, kickTime: -9, ownT: 0,
   lastTouch: null, lastTeam: null, passTarget: null, pendingPass: null, shotBy: null, shotOn: false, shotX: CX, shotY: CY,
-  inGoal: 0, spin: 0, lastPostT: -9, curve: 0, curveT: 0
+  inGoal: 0, spin: 0, lastPostT: -9, curve: 0, curveT: 0, passKind: ''
 };
 var TMP = { x: 0, y: 0, z: 0, t: 0 }, TMP2 = { x: 0, y: 0, z: 0, t: 0 };
 var BP = { r: null, score: 0, kind: 'ground' };
@@ -979,7 +980,7 @@ function setupTeams(defA, defB, aiA, aiB, humanA) {
       t.players.push(p); G.players.push(p); G.drawList.push(p);
     }
   }
-  G.human = humanA ? { team: A, ctrl: A.players[6], switchT: 0, forceSwitch: false } : null;
+  G.human = humanA ? { team: A, ctrl: A.players[6], switchT: 0, forceSwitch: false, lock: false, lockX: 0, lockY: 0 } : null;
 }
 function resetBall(x, y) {
   var b = ball;
@@ -1210,6 +1211,110 @@ function predictAtX(lineX, out, maxSteps) {
   return false;
 }
 
+/* ---- 패스 어시스트 도우미 ---- */
+// 땅볼: 속도 v0 로 찬 공이 거리 d 를 굴러간 뒤의 속도 (구르는 마찰 모델: dv/dt = -FRIC·v - ROLL_DECEL)
+function rollDistTo(v0, va) { // v0 → va 로 줄어들 때까지 굴러가는 거리
+  var F = FRIC, D = ROLL_DECEL;
+  return (v0 - va) / F - D / (F * F) * Math.log((F * v0 + D) / (F * va + D));
+}
+function rollTime(v0, va) { return Math.log((FRIC * v0 + ROLL_DECEL) / (FRIC * va + ROLL_DECEL)) / FRIC; }
+// 거리 d 에서 도착 속도가 va 가 되도록 하는 킥 속도
+function groundV0(d, va) {
+  var lo = va, hi = 1600;
+  for (var i = 0; i < 26; i++) { var m = (lo + hi) / 2; if (rollDistTo(m, va) < d) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+// 거리 d 까지 T 초 만에 도착하게 하는 킥 속도와 도착 속도 (va 가 너무 작아지면 null)
+var GV = { v0: 0, va: 0, t: 0 };
+function groundForTime(d, T) {
+  var lo = 60, hi = 900;
+  for (var i = 0; i < 24; i++) {
+    var va = (lo + hi) / 2, v0 = groundV0(d, va);
+    if (rollTime(v0, va) > T) lo = va; else hi = va;
+  }
+  GV.va = (lo + hi) / 2; GV.v0 = groundV0(d, GV.va); GV.t = rollTime(GV.v0, GV.va);
+  return GV;
+}
+// 뜬 공: 비행 시간 T 동안 수평 거리 d 를 날아가게 하는 수평 속도 (공기 저항 보정)
+function loftSpeed(d, T) { return d * AIR_DRAG / (1 - Math.exp(-AIR_DRAG * T)); }
+// 선수가 (x, y) 까지 달려가는 데 걸리는 시간 (전력 질주 기준, 발이 닿는 거리 제외)
+function runTime(p, x, y, sprint) {
+  var sf = p.stamina < 0.3 ? 0.78 + 0.22 * (p.stamina / 0.3) : 1;
+  var v = p.speed * p.team.ai.speed * sf * (sprint && p.stamina > 0.05 ? SPRINT_MUL : 1);
+  return Math.max(0, dist(p.x, p.y, x, y) - (PR + BR + 3)) / v;
+}
+// 상대가 패스 길을 끊을 수 있는지: (상대가 공 길목에 닿는 시간 - 공이 그 지점에 닿는 시간)의 최솟값(초).
+// 음수면 끊길 가능성이 큽니다. lofted 면 머리 높이 아래로 내려온 구간만 봅니다.
+function passRisk(t, x0, y0, x1, y1, v0, lofted, T) {
+  var o = t.opp.players, d = dist(x0, y0, x1, y1) || 1, ux = (x1 - x0) / d, uy = (y1 - y0) / d;
+  var best = 9, s = 0, v = v0, tm = 0, h = 1 / 30, i, k;
+  for (i = 0; i < 90; i++) {
+    tm += h;
+    if (lofted) { s = Math.min(d, d * tm / T); if (tm < T * 0.8) { if (s >= d) break; continue; } }
+    else { s += v * h; v = Math.max(0, v * (1 - FRIC * h) - ROLL_DECEL * h); }
+    if (s > d + 30) break;
+    var px = x0 + ux * s, py = y0 + uy * s;
+    for (k = 0; k < o.length; k++) {
+      var q = o[k];
+      if (q.stun > 0.25 || q.slideT > 0) continue;
+      if (q.role === 'GK' && !inOwnBox(q.team, px, py)) continue;
+      var tq = Math.max(0, dist(q.x, q.y, px, py) - (PR + BR + 4)) / (q.speed * q.team.ai.speed * SPRINT_MUL) + 0.1;
+      if (tq - tm < best) best = tq - tm;
+    }
+    if (s >= d && (lofted || v < 5)) break;
+    if (!lofted && v < 5) break;
+  }
+  return best;
+}
+// 공 궤적 예측 (한 프레임에 한 번 계산해 여러 선수가 함께 사용)
+var TRJ = { n: 0, x: new Float32Array(120), y: new Float32Array(120), z: new Float32Array(120), t: new Float32Array(120), at: -1 };
+function buildTraj() {
+  var b = ball;
+  if (TRJ.at === G.time) return;
+  TRJ.at = G.time;
+  var x = b.x, y = b.y, z = b.z, vx = b.vx, vy = b.vy, vz = b.vz, cu = b.curve, ct = b.curveT, h = 1 / 60, n = 0;
+  for (var i = 1; i <= 216 && n < 120; i++) {
+    if (ct > 0 && cu) {
+      var cs = Math.sqrt(vx * vx + vy * vy);
+      if (cs > 1) { var cvx = vx; vx += -vy / cs * cu * h; vy += cvx / cs * cu * h; }
+      ct -= h;
+    }
+    x += vx * h; y += vy * h;
+    if (z > 0 || vz > 0) {
+      z += vz * h; vz -= GRAV * h;
+      if (z <= 0) { z = 0; if (vz < -90) { vz = -vz * 0.45; vx *= 0.8; vy *= 0.8; } else vz = 0; }
+    }
+    var s = Math.sqrt(vx * vx + vy * vy);
+    if (z <= 0.5) { if (s > 0) { var ns = Math.max(0, s * (1 - FRIC * h) - ROLL_DECEL * h); vx *= ns / s; vy *= ns / s; } }
+    else { vx *= 1 - AIR_DRAG * h; vy *= 1 - AIR_DRAG * h; }
+    if (i % 2 === 0) { TRJ.x[n] = x; TRJ.y[n] = y; TRJ.z[n] = z; TRJ.t[n] = i * h; n++; }
+    if (s < 4 && z <= 0 && vz <= 0) { TRJ.x[n] = x; TRJ.y[n] = y; TRJ.z[n] = 0; TRJ.t[n] = i * h; n++; break; }
+  }
+  TRJ.n = n;
+}
+// 받는 선수가 공을 맞이할 수 있는 가장 이른 지점 (공이 발·가슴 높이로 내려와 있는 곳)
+function receivePoint(p, out, zMax) {
+  buildTraj();
+  var n = TRJ.n;
+  if (!n) { out.x = ball.x; out.y = ball.y; out.t = 0; return false; }
+  for (var i = 0; i < n; i++) {
+    if (TRJ.z[i] > zMax) continue;
+    var x = TRJ.x[i], y = TRJ.y[i];
+    if (runTime(p, x, y, true) + 0.06 <= TRJ.t[i]) { out.x = x; out.y = y; out.t = TRJ.t[i]; return true; }
+  }
+  out.x = TRJ.x[n - 1]; out.y = TRJ.y[n - 1]; out.t = TRJ.t[n - 1];
+  return false;
+}
+// 받는 선수 이동: 공이 올 지점으로 마중 나가고, 여유가 없을 때만 전력 질주
+function recvZ() { return CHEST_Z + (ball.passKind === 'cross' ? 0 : 10); }
+function runToReceive(p, forceSprint) {
+  receivePoint(p, TMP, recvZ());
+  var tNorm = runTime(p, TMP.x, TMP.y, false);
+  var sprint = forceSprint || (tNorm + 0.1 > TMP.t && p.stamina > 0.12);
+  steerTo(p, clamp(TMP.x, -10, PW + 10), clamp(TMP.y, -10, PH + 10), sprint, 10);
+  return TMP;
+}
+
 /* =====================================================================
  * 8. 공 차기 · 패스 · 슛 · 태클
  * ===================================================================== */
@@ -1222,38 +1327,104 @@ function kickBall(p, vx, vy, vz, power) {
   b.vx = vx; b.vy = vy; b.vz = vz;
   if (vz > 0 && b.z < 1) b.z = 1;
   b.kicker = p; b.kickTime = G.time; b.lastTouch = p; b.lastTeam = p.team;
-  b.passTarget = null; b.pendingPass = null; b.shotBy = null; b.shotOn = false; b.curve = 0; b.curveT = 0;
+  b.passTarget = null; b.pendingPass = null; b.passKind = ''; b.shotBy = null; b.shotOn = false; b.curve = 0; b.curveT = 0;
   p.fx = vx / sp; p.fy = vy / sp; p.kickCd = 0.3; p.charge = 0; p.passCharge = 0;
   Snd.kick(power === undefined ? 0.5 : power);
 }
+// 스루 패스 때 받는 선수가 달려 들어갈 방향 (상대 골 쪽, 측면이면 조금 안쪽으로 · 이미 앞으로 뛰는 중이면 그 방향을 살림)
+function runDir(r, out) {
+  var t = r.team, dx = t.dir, dy = clamp((CY - r.y) / PH * 0.9, -0.4, 0.4);
+  var sp = Math.sqrt(r.vx * r.vx + r.vy * r.vy);
+  if (sp > 60 && r.vx * t.dir > 0) { dx += r.vx / sp * 0.6; dy += r.vy / sp * 0.6; }
+  var l = Math.sqrt(dx * dx + dy * dy) || 1; out.x = dx / l; out.y = dy / l;
+}
+// 공간 패스 계획: 받는 선수의 침투 경로 앞 빈 공간 중, 수비·골키퍼보다 먼저 닿을 수 있는 곳을 고릅니다.
+var PP = { x: 0, y: 0, v: 0, vz: 0, t: 0 }, RD = { x: 0, y: 0 };
+function planThrough(p, r, lofted) {
+  var t = p.team, o = t.opp.players, bs = -1e9, found = false;
+  runDir(r, RD);
+  for (var L = 60; L <= (lofted ? 255 : 170); L += 15) {
+    var sx = clamp(r.x + RD.x * L, 30, PW - 30), sy = clamp(r.y + RD.y * L, 30, PH - 30);
+    if (fwdN(t, sx) > 0.96) continue;
+    var d = dist(ball.x, ball.y, sx, sy); if (d < 60) continue;
+    var tr = runTime(r, sx, sy, true) + 0.12, v, vz = 0, tb;
+    if (lofted) {
+      tb = clamp(tr, 0.8, 1.5);
+      v = loftSpeed(d, tb); if (v > 760) { v = 760; tb = d / v; }
+      if (v < 230) continue;
+      vz = GRAV * tb / 2;
+    } else {
+      // 땅볼 스루: 공이 그 공간에 먼저 도착해 적당한 속도로 계속 굴러가도록 (선수가 달리면서 이어받음)
+      var va = clamp(170 + d * 0.14, 190, 260);
+      v = Math.min(900, groundV0(d, va)); tb = rollTime(v, va);
+    }
+    var td = 9;
+    for (var k = 0; k < o.length; k++) {
+      var q = o[k]; if (q.stun > 0.25) continue;
+      var tq = runTime(q, sx, sy, true) - (q.role === 'GK' ? (lofted ? 0.35 : 0.12) : 0) + 0.1; // 골키퍼는 뜬 공을 손으로 먼저 잡아 냅니다
+      if (tq < td) td = tq;
+    }
+    var margin = td - Math.max(tr, tb) - 0.05;
+    var risk = passRisk(t, ball.x, ball.y, sx, sy, v, lofted, tb);
+    // 안전 여유가 가장 큰 곳 · 공이 너무 오래 굴러가지 않는 곳 우선
+    var sc = lofted ? Math.min(margin, risk + 0.1) + L * 0.0012 + (fwdN(t, sx) - fwdN(t, r.x)) * 0.4
+      : Math.min(margin, risk + 0.1) * 0.5 - Math.abs(L - 105) * 0.003;
+    if (sc > bs) { bs = sc; found = true; PP.x = sx; PP.y = sy; PP.v = v; PP.vz = vz; PP.t = tb; }
+  }
+  return found;
+}
 function passTo(p, r, kind, noise, power) {
-  var t = p.team;
-  var tx = r.x, ty = r.y;
-  var tt = dist(p.x, p.y, tx, ty) / 520;
-  tx += r.vx * tt * 0.8; ty += r.vy * tt * 0.8;
-  if (kind === 'through' || kind === 'lobthrough') { tx += t.dir * rand(95, 140); }
+  var t = p.team, sx = ball.x, sy = ball.y;
+  var tx = r.x, ty = r.y, d, v, vz = 0, i, T = 0.6;
+  // 받는 선수가 움직이고 있으면 공이 도착할 때쯤 있을 곳을 겨냥합니다 (받는 선수도 공 쪽으로 마중 나옴)
+  var lead = r.role === 'GK' ? 0 : 0.55;
+  var plannedV = 0;
+  if ((kind === 'through' || kind === 'lobthrough') && planThrough(p, r, kind === 'lobthrough')) {
+    tx = PP.x; ty = PP.y; plannedV = PP.v; vz = PP.vz; T = PP.t;
+  } else {
+    if (kind === 'through' || kind === 'lobthrough') { runDir(r, RD); tx += RD.x * 100; ty += RD.y * 100; }
+    for (i = 0; i < 3; i++) {
+      var ex = tx + r.vx * T * lead, ey = ty + r.vy * T * lead;
+      d = dist(sx, sy, ex, ey);
+      if (kind === 'lob' || kind === 'lobthrough' || kind === 'cross') T = d / clamp(d * 0.75 + 120, 280, 700) * (kind === 'cross' ? 1 : 0.97);
+      else if (kind === 'throw') T = d / clamp(d * 0.9 + 110, 200, 440);
+      else { var va0 = clamp(185 + d * 0.16, 200, 290) + (power || 0) * 120; T = rollTime(groundV0(d, va0), va0); }
+    }
+    tx += r.vx * T * lead; ty += r.vy * T * lead;
+  }
   tx = clamp(tx, 25, PW - 25); ty = clamp(ty, 25, PH - 25);
-  var dx = tx - ball.x, dy = ty - ball.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+  var dx = tx - sx, dy = ty - sy;
+  d = Math.sqrt(dx * dx + dy * dy) || 1;
   var ang = Math.atan2(dy, dx) + gauss() * noise;
-  var v, vz = 0;
-  if (kind === 'lob' || kind === 'lobthrough' || kind === 'cross') {
+  if (plannedV) v = plannedV;
+  else if (kind === 'cross') {
     v = clamp(d * 0.75 + 120, 280, 700);
-    var T = d / v * (kind === 'cross' ? 1.0 : 0.95);
-    vz = GRAV * T / 2;
+    vz = GRAV * (d / v) / 2;
+  } else if (kind === 'lob' || kind === 'lobthrough') {
+    // 받는 선수 발밑(조금 앞)에 떨어지도록: 비행 시간 T 를 정하고 공기 저항을 보정한 수평 속도로 찹니다.
+    var dl = Math.max(40, d - 8);
+    T = clamp(0.35 + dl / 650, 0.72, 1.4);
+    v = loftSpeed(dl, T); vz = GRAV * T / 2;
   } else if (kind === 'throw') {
     v = clamp(d * 0.9 + 110, 200, 440);
     vz = GRAV * (d / v) * 0.35;
   } else {
-    v = clamp(FRIC * d + 170 + (kind === 'through' ? 40 : 0), 240, PICKUP_MAX);
-    // 패스 키를 길게 누를수록 더 세게 (받는 선수가 잡을 수 있는 속도까지)
-    if (power) v = Math.min(PICKUP_MAX, v * (1 + power * 0.3));
+    // 땅볼: 거리에 맞춰 세기를 자동 조절 → 받는 선수 앞에서 다루기 쉬운 속도(약 200~290)로 도착.
+    // S 를 길게 누르면 더 세게 (그래도 받을 수 있는 속도 안에서)
+    var va = clamp(185 + d * 0.16, 200, 290) + (power || 0) * 120;
+    v = Math.min(900, groundV0(d, va));
   }
-  v *= 1 + gauss() * noise * 0.4;
+  v *= 1 + gauss() * noise * 0.3;
   kickBall(p, Math.cos(ang) * v, Math.sin(ang) * v, vz, 0.35 + v / 2200);
-  ball.passTarget = r; ball.pendingPass = t;
+  ball.passTarget = r; ball.pendingPass = t; ball.passKind = kind;
   r.receiveT = 2.6;
   if (!G.demo) t.stats.passes++;
-  if (G.human && t === G.human.team && r.role !== 'GK') setCtrl(r);
+  if (G.human && t === G.human.team && r.role !== 'GK') {
+    setCtrl(r);
+    // 패스 직후 방향키를 그대로 누르고 있어도 받는 선수가 엉뚱한 곳으로 뛰지 않도록, 손을 떼거나 방향을 바꿀 때까지 자동으로 마중 나갑니다.
+    var H = G.human, m = Math.sqrt(Input.ax * Input.ax + Input.ay * Input.ay);
+    H.lock = m > 0.15; H.lockX = m > 0.15 ? Input.ax / m : 0; H.lockY = m > 0.15 ? Input.ay / m : 0;
+  }
 }
 function shoot(p, power, aimY, noise, curl) {
   var t = p.team, gx = oppGoalX(t);
@@ -1306,6 +1477,13 @@ function setOwner(p) {
     if (b.pendingPass === p.team) { if (!G.demo) p.team.stats.passOk++; }
     else if (G.human && G.phase === 'play') toastSoft(p.team === G.human.team ? '패스 차단!' : '패스가 끊겼습니다', '#e2e8f0');
     b.pendingPass = null;
+  }
+  // 퍼스트 터치: 패스를 받은 선수는 속도를 살짝 줄이며 공을 발 앞(움직이는 방향)에 붙입니다.
+  // 제자리에서 받으면 공이 온 방향으로 몸을 돌려 받습니다.
+  if (b.passTarget === p && G.phase === 'play') {
+    var ps = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+    p.vx *= 0.82; p.vy *= 0.82;
+    if (ps < 40) { var bs2 = Math.sqrt(b.vx * b.vx + b.vy * b.vy); if (bs2 > 30) { p.fx = -b.vx / bs2; p.fy = -b.vy / bs2; } }
   }
   b.owner = p; b.lastTouch = p; b.lastTeam = p.team; b.passTarget = null; b.shotBy = null; b.ownT = G.time;
   b.z = 0; b.vz = 0; b.inGoal = 0; b.curve = 0; b.curveT = 0;
@@ -1401,6 +1579,7 @@ function deflect(p) {
   b.vx = b.vx * 0.55 + rand(-60, 60); b.vy = b.vy * 0.55 + rand(-60, 60); b.vz = Math.max(b.vz, rand(0, 110));
   b.x = p.x + nx * (PR + BR + 1); b.y = p.y + ny * (PR + BR + 1);
   b.lastTouch = p; b.lastTeam = p.team; p.touchCd = 0.25; b.curve = 0; b.curveT = 0;
+  if (b.pendingPass && b.pendingPass !== p.team) { b.pendingPass = null; b.passTarget = null; } // 상대 몸에 맞으면 더 이상 우리 패스가 아님
   if (b.shotBy && b.shotBy.team !== p.team) toastSoft('몸으로 막아냅니다!', '#e2e8f0');
   b.shotBy = null;
   Snd.kick(0.3);
@@ -1444,28 +1623,46 @@ function isHumanCtrl(p) {
   var ph = G.phase;
   return !!(G.human && G.human.ctrl === p && (ph === 'play' || ph === 'setpiece' || ph === 'kickoff'));
 }
-function pickReceiver(p, dx, dy, through, power) {
+// 패스 받을 동료 고르기 (패스 어시스트): 입력 방향 주변의 넓은 부채꼴 안에서, 방향이 잘 맞고
+// 마크가 느슨하며 패스 길을 상대가 끊기 어려운 동료를 고릅니다. 앞을 가리키는데 등 뒤 동료를 고르지는 않습니다.
+function pickReceiver(p, dx, dy, through, power, lofted) {
   var t = p.team, l = Math.sqrt(dx * dx + dy * dy) || 1; dx /= l; dy /= l;
   var best = null, bs = -1e9, fb = null, fbs = -1e9, dw = 900 + (power || 0) * 1200;
+  var fwdStick = dx * t.dir > 0.45;
   for (var i = 0; i < t.players.length; i++) {
     var r = t.players[i]; if (r === p) continue;
     var rx = r.x - p.x, ry = r.y - p.y, d = Math.sqrt(rx * rx + ry * ry); if (d < 25) continue;
     var c = (rx * dx + ry * dy) / d;
-    var lc = laneClear(t, p.x, p.y, r.x, r.y), lane = clamp(lc / 60, 0, 1);
-    var s = c * 2.4 - d / dw + lane * 1.2 - (lc < 15 ? 1.5 : 0) - (r.role === 'GK' ? 1.3 : 0);
-    if (through) s += (fwdN(t, r.x) - fwdN(t, p.x)) * 1.5;
-    if (c > 0.45 && s > bs) { bs = s; best = r; }
-    if (c > 0.1 && s > fbs) { fbs = s; fb = r; }
+    if (c < -0.1) continue;
+    // 방향 일치도: ±15° 안은 같은 점수, 그 밖은 빠르게 감점 (방향키가 가리킨 선수를 우선 존중)
+    var deg = Math.acos(clamp(c, -1, 1)) * 57.3;
+    var s = 3.0 - Math.max(0, deg - 15) * 0.08 - d / dw;
+    // 받는 선수 주변 여유 공간
+    s += clamp((nearestOppDistXY(t, r.x, r.y) - 25) / 110, 0, 1) * 0.5;
+    // 패스 길 위험도 (실제로 찰 세기 기준으로 상대가 먼저 닿을 수 있는지)
+    var risk;
+    if (lofted) risk = passRisk(t, ball.x, ball.y, r.x, r.y, 0, true, clamp(d / clamp(d * 0.75 + 120, 280, 700), 0.62, 1.45));
+    else { var va = clamp(185 + d * 0.16, 200, 290); risk = passRisk(t, ball.x, ball.y, r.x, r.y, Math.min(900, groundV0(d, va)), false, 0); }
+    // (스루·로빙은 받는 선수가 공간으로 뛰어 들어가 받으므로 지금 위치 기준 위험도를 덜 반영)
+    s += (through || lofted) ? clamp(risk / 0.4, -0.7, 0.3) : clamp(risk / 0.3, -1.2, 0.4);
+    if (r.role === 'GK') s -= 1.5;
+    if (!lofted && d > 600) s -= (d - 600) / 200;
+    if (lofted && d < 170) s -= (170 - d) / 80; // 가까운 동료에게 로빙은 비효율
+    if (through) s += (fwdN(t, r.x) - fwdN(t, p.x)) * 1.5 + aheadSpace(r) * 0.3;
+    // 앞을 가리키는데 뒤쪽 동료 → 크게 감점 (다른 선택지가 없을 때만)
+    if (fwdStick && (r.x - p.x) * t.dir < -20) s -= 1.2;
+    if (c > 0.3 && s > bs) { bs = s; best = r; }
+    if (s > fbs) { fbs = s; fb = r; }
   }
-  // 입력 방향과 거의 맞는 동료가 없으면 null → 입력 방향 빈 공간으로 찹니다 (등 뒤로 패스하지 않음)
+  // 입력 방향과 맞는 동료가 없으면 대략 같은 쪽(±95°)의 동료, 그것도 없으면 null → 입력 방향 빈 공간으로 찹니다
   return best || fb;
 }
 // kind: 'ground'(S 짧은 패스) · 'through'(W 스루) · 'lobthrough'(Q+W 로빙 스루)
 function humanPass(p, dx, dy, kind, power) {
-  var t = p.team, noise = 0.03 + (100 - t.def.att) / 100 * 0.03;
+  var t = p.team, noise = 0.012 + (100 - t.def.att) / 100 * 0.02; // 사람 패스는 오차를 아주 작게
   power = power || 0;
   var thr = kind === 'through' || kind === 'lobthrough';
-  var r = pickReceiver(p, dx, dy, thr, power);
+  var r = pickReceiver(p, dx, dy, thr, power, kind === 'lobthrough');
   if (!r) {
     var l = Math.sqrt(dx * dx + dy * dy) || 1, v;
     if (kind === 'lobthrough') { v = 470; kickBall(p, dx / l * v, dy / l * v, 215, 0.55); }
@@ -1477,13 +1674,13 @@ function humanPass(p, dx, dy, kind, power) {
 }
 // A: 로빙 패스. 상대 진영 측면 끝(바이라인 근처)에서는 문전으로 크로스.
 function humanLob(p, dx, dy) {
-  var t = p.team, noise = 0.04 + (100 - t.def.att) / 100 * 0.04;
+  var t = p.team, noise = 0.02 + (100 - t.def.att) / 100 * 0.03;
   if (inCrossZone(p)) {
     passTo(p, bestBoxTarget(t, p), 'cross', noise * 1.2);
     toastSoft('크로스!', '#e2e8f0');
     return;
   }
-  var r = pickReceiver(p, dx, dy, false, 0.7);
+  var r = pickReceiver(p, dx, dy, false, 0.7, true);
   if (!r) {
     var l = Math.sqrt(dx * dx + dy * dy) || 1;
     kickBall(p, dx / l * 470, dy / l * 470, 230, 0.55); ball.pendingPass = t; if (!G.demo) t.stats.passes++;
@@ -1516,7 +1713,7 @@ function humanSetPiece(p, mode, ax, ay, mag) {
   else if (sp.type === 'throw') { r = pickReceiver(p, dx, dy, mode !== 'short', mode === 'long' ? 1 : 0); kind = 'throw'; }
   else if (mode === 'short') { r = pickReceiver(p, dx, dy, false, 0); kind = 'ground'; }
   else if (mode === 'through') { r = pickReceiver(p, dx, dy, true, 0); kind = 'through'; }
-  else { r = pickReceiver(p, dx, dy, mode === 'long', mode === 'long' ? 1.5 : 0.7); kind = 'lob'; }
+  else { r = pickReceiver(p, dx, dy, mode === 'long', mode === 'long' ? 1.5 : 0.7, true); kind = 'lob'; }
   if (!r) r = nearestTeammate(p);
   takeSetPiece(p, r, kind, noise);
 }
@@ -1563,6 +1760,15 @@ function humanStep(dt) {
   var mod = Input.held.mod || Input.modLatch;
   var ax = Input.ax, ay = Input.ay, mag = Math.sqrt(ax * ax + ay * ay);
   var hasBall = ball.owner === p;
+  // 패스를 받는 중(공이 이 선수에게 날아오는 중)
+  var receiving = ph === 'play' && !ball.owner && ball.passTarget === p && ball.pendingPass === t;
+  if (!receiving) H.lock = false;
+  else if (H.lock) {
+    // 패스할 때 누르던 방향키를 그대로 누르고 있는 동안은 입력을 무시하고 자동으로 공을 마중 나갑니다.
+    // 손을 떼거나 다른 방향(약 45° 이상)으로 바꾸면 그때부터 직접 조작.
+    if (mag <= 0.15 || (ax * H.lockX + ay * H.lockY) / mag < 0.7) H.lock = false;
+    else { ax = 0; ay = 0; mag = 0; }
+  }
   p.desX = 0; p.desY = 0; p.desSprint = Input.held.sprint;
   if ((ph === 'setpiece' || ph === 'kickoff') && hasBall) {
     if (mag > 0.2 && ph === 'setpiece') { p.fx = ax / mag; p.fy = ay / mag; }
@@ -1594,8 +1800,19 @@ function humanStep(dt) {
     H.containing = true;
     if (dist(p.x, p.y, ball.x, ball.y) < PR + BR + 16) standTackle(p);
   }
-  else if (mag > 0.15) { p.desX = ax; p.desY = ay; }
-  else if (!ball.owner && ball.passTarget === p) { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, Input.held.sprint, 16); }
+  else if (receiving && mag <= 0.15) runToReceive(p, Input.held.sprint);
+  else if (mag > 0.15) {
+    p.desX = ax; p.desY = ay;
+    // 직접 움직여도 공이 가까이 오면 공 쪽으로 살짝 끌어당겨 받기 쉽게 (부드러운 자석)
+    if (receiving) {
+      receivePoint(p, TMP, recvZ());
+      var rd = dist(p.x, p.y, TMP.x, TMP.y), bd = dist(p.x, p.y, ball.x, ball.y);
+      if (rd > 3 && rd < 70 && bd < 160) {
+        var w = 0.45 * (1 - rd / 70);
+        p.desX = ax * (1 - w) + (TMP.x - p.x) / rd * w; p.desY = ay * (1 - w) + (TMP.y - p.y) / rd * w;
+      }
+    }
+  }
   // 떠 있는 공(상대 패스·튕겨 나온 공)도 S 를 누르고 있으면 공이 올 곳으로 달려갑니다.
   else if (!hasBall && Input.held.pass && !ball.owner && ph === 'play') { interceptPoint(p, TMP); steerTo(p, TMP.x, TMP.y, Input.held.sprint, 8); }
   if (ph !== 'play') return;
@@ -1647,6 +1864,14 @@ function teamPrecompute() {
         if (d < bt) { bt = d; t.chaser = p; }
       }
       if (hc && t.chaser && dist(t.chaser.x, t.chaser.y, ball.x, ball.y) > hd * 0.85 && hd < 260) t.chaser = null;
+      // 우리 편 패스가 날아가는 중: 받기로 한 선수만 공을 맞이하러 가고, 다른 동료는 따라붙지 않습니다.
+      // (패스가 크게 빗나가 받는 선수보다 훨씬 먼저 닿을 동료가 있을 때만 그 동료도 쫓아갑니다)
+      var pt = ball.passTarget;
+      if (pt && pt.team === t && ball.pendingPass === t && t.chaser && t.chaser !== pt) {
+        receivePoint(pt, TMP2, CHEST_Z); var tp = TMP2.t;
+        receivePoint(t.chaser, TMP2, CHEST_Z);
+        if (tp <= TMP2.t + 0.6) t.chaser = null;
+      }
     } else if (ball.owner.team !== t && !ball.owner.holding) {
       var n = t.ai.pressers;
       if (hc) n = hd > 130 ? 1 : 0;
@@ -1790,6 +2015,7 @@ function aiField(p, dt) {
   p.runT -= dt;
   if (p.runT <= 0) { p.runT = rand(1.5, 3.5); p.runX = rand(-40, 40); p.runY = rand(-55, 55); }
   if (!own) {
+    if (ball.passTarget === p && ball.pendingPass === t) { runToReceive(p, false); return; }
     if (ball.passTarget === p || p === t.chaser) {
       interceptPoint(p, TMP);
       d = dist(p.x, p.y, TMP.x, TMP.y);
@@ -2114,12 +2340,15 @@ function checkBallContacts() {
     if (p.stun > 0) continue;
     if (p === b.kicker && G.time - b.kickTime < 0.28) continue;
     var gk = p.role === 'GK' && inOwnBox(p.team, b.x, b.y);
-    var reach = PR + BR + 3 + (gk ? (p.diveT > 0 ? 16 : 9) : 0) + (p.slideT > 0 ? 5 : 0);
+    // 패스를 받기로 한 선수는 공을 맞이할 준비가 되어 있어 조금 더 넓게 · 조금 더 높은 공까지 받아 냅니다.
+    var mine = !gk && p === b.passTarget && b.pendingPass === p.team;
+    var reach = PR + BR + 3 + (gk ? (p.diveT > 0 ? 16 : 9) : 0) + (p.slideT > 0 ? 5 : 0) + (mine ? 6 : 0);
     var dx = b.x - p.x, dy = b.y - p.y, d2 = dx * dx + dy * dy;
     if (d2 > (reach + 4) * (reach + 4)) continue;
     // 우리 팀 로빙/크로스를 받는 선수는 (슈팅 지역이 아니면) 헤딩으로 걷어내지 않고 가슴·발로 받아 둡니다.
     var recv = !gk && (p === b.passTarget || (b.pendingPass && b.pendingPass === p.team));
-    if (b.z > (gk ? 60 : (recv ? CHEST_Z : 16))) {
+    // (크로스가 아닌 로빙은 받는 선수가 내려오는 공을 가슴·머리로 떨궈 받아 냅니다)
+    if (b.z > (gk ? 60 : (recv ? CHEST_Z + (mine && b.vz <= 0 ? (b.passKind === 'cross' ? 4 : 14) : 0) : 16))) {
       if (!gk && b.z < 46 && p.headerCd <= 0 && p.slideT <= 0 && !head && (!recv || headerShotZone(p))) head = p;
       continue;
     }
@@ -2134,7 +2363,8 @@ function checkBallContacts() {
     return;
   }
   var rs = dist(0, 0, b.vx - p.vx, b.vy - p.vy);
-  if (rs > PICKUP_MAX) { if (p.touchCd <= 0) deflect(p); return; }
+  var mineP = p === b.passTarget && b.pendingPass === p.team;
+  if (rs > PICKUP_MAX + (mineP ? 180 : 0)) { if (p.touchCd <= 0) deflect(p); return; }
   // 양 팀 경합
   var o = p.team.opp.players, rival = null;
   for (i = 0; i < o.length; i++) {
@@ -2144,7 +2374,7 @@ function checkBallContacts() {
   }
   var winner = p;
   if (rival) {
-    var sa = (p.team.def.def + p.team.def.spd) * p.team.ai.tackle + rand(0, 70);
+    var sa = (p.team.def.def + p.team.def.spd) * p.team.ai.tackle + rand(0, 70) + (mineP ? 25 : 0);
     var sb = (rival.team.def.def + rival.team.def.spd) * rival.team.ai.tackle + rand(0, 70);
     if (sb > sa) winner = rival;
   }
@@ -2445,6 +2675,26 @@ function drawBall() {
   ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,0.45)'; circle(x, dy, r); ctx.stroke();
 }
 function sortByY(a, b) { return a.y - b.y; }
+// 우리 편 패스가 날아가는 동안: 공을 받을 예상 지점 표시 + 받는 선수 강조 (은은하게)
+var RCV = { x: 0, y: 0, t: 0 };
+function drawPassAssist() {
+  var r = ball.passTarget;
+  if (!G.human || G.mode !== 'match' || G.phase !== 'play' || ball.owner || !r || r.team !== G.human.team || ball.pendingPass !== r.team) return;
+  receivePoint(r, RCV, recvZ());
+  var a = 0.78 + Math.sin(G.time * 8) * 0.18, x = RCV.x, y = RCV.y;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(125,211,252,' + a.toFixed(2) + ')'; ctx.lineWidth = 2;
+  if (dist(r.x, r.y, x, y) > 24) {
+    ctx.setLineDash([3, 6]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(r.x, r.y + 2); ctx.lineTo(x, y); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 2;
+  }
+  ctx.lineWidth = 2.5; ctx.beginPath(); ctx.ellipse(x, y, 12, 8, 0, 0, 6.2832); ctx.stroke();
+  ctx.fillStyle = 'rgba(224,242,254,' + a.toFixed(2) + ')';
+  ctx.beginPath(); ctx.ellipse(x, y, 3.5, 2.4, 0, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = 'rgba(125,211,252,0.8)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(r.x, r.y + 2, PR + 11, (PR + 11) * 0.72, 0, 0, 6.2832); ctx.stroke();
+  ctx.restore();
+}
 function drawWorld() {
   drawPitch();
   drawGoalBack(0); drawGoalBack(1);
@@ -2454,6 +2704,7 @@ function drawWorld() {
     ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.ellipse(ctrl.x, ctrl.y + 2, (PR + 7) * pulse, (PR + 7) * 0.72 * pulse, 0, 0, 6.2832); ctx.stroke();
   }
+  drawPassAssist();
   var dl = G.drawList;
   dl.sort(sortByY);
   ctx.font = '800 11px "Noto Sans KR", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
