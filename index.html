@@ -49,8 +49,6 @@ h3{font-size:14px;color:var(--muted);margin:14px 0 7px;font-weight:700;letter-sp
 .btn[disabled]{opacity:.55;cursor:default}
 .back{background:none;border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:0 16px;min-height:48px;min-width:72px;font:700 15px var(--body);cursor:pointer;flex:none}
 .row{display:flex;gap:10px}.row>*{flex:1}
-.setup-row{flex-wrap:wrap;column-gap:14px}.setup-row>*{flex:1 1 250px}
-input.txt#nick{padding:10px 14px}
 /* 타이틀 */
 .title-panel{text-align:center;max-width:430px;padding:30px 26px 22px}
 .logo{font-family:var(--title);font-size:64px;line-height:1;letter-spacing:2px;margin:6px 0 4px;
@@ -59,45 +57,137 @@ input.txt#nick{padding:10px 14px}
 .logo-sub{color:var(--muted);font-weight:700;letter-spacing:4px;font-size:12px;margin-bottom:18px}
 .ball-ico{width:64px;height:64px;margin:0 auto}
 .foot{margin-top:16px;color:var(--muted);font-size:12px}
-/* 팀 선택 */
-.teams{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.team-card{display:flex;flex-direction:column;gap:8px;text-align:left;padding:9px 10px;border-radius:13px;background:var(--panel2);
-  border:2px solid transparent;color:inherit;font:inherit;cursor:pointer;min-width:0}
-@media (hover:hover){.team-card:hover{background:rgba(255,255,255,.09)}}
-.team-card.sel{border-color:var(--acc);background:rgba(250,204,21,.11)}
-.team-card.dis{opacity:.32;cursor:not-allowed}
-.tc-top{display:flex;align-items:center;gap:8px;min-width:0}
-.kit{flex:none;width:30px;height:30px;border-radius:50%;border:4px solid;box-shadow:0 2px 6px rgba(0,0,0,.4)}
-.tn{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ta{font-size:11px;color:var(--muted);font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.st{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--muted);min-width:0}
-.st span{display:flex;justify-content:space-between;white-space:nowrap}.st b{color:#e2e8f0;font-weight:800}
-.bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
-.bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#22c55e,#facc15)}
-.seg{display:flex;gap:6px}
-.seg button{flex:1;min-height:48px;padding:11px 6px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:700 15px var(--body);cursor:pointer}
+/* 경기 설정: 왼쪽 내 팀 · 가운데 VS · 오른쪽 상대 (컴퓨터), 아래 옵션 줄 */
+#scr-setup{background:linear-gradient(180deg,rgba(3,10,6,.5),rgba(3,10,6,.78))}
+.su-wrap{width:100%;max-width:1280px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.su-top{display:flex;align-items:center;gap:12px}
+.su-top h2{font-size:30px}
+.su-match{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px}
+.su-side{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:22px;overflow:hidden;border:1px solid var(--line);
+  background:var(--panel);box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.su-glow{position:absolute;left:0;top:0;right:0;bottom:0;opacity:.55;pointer-events:none;transition:background .35s}
+.su-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0 16px}
+.su-tag{font:900 13px var(--body);padding:5px 11px;border-radius:999px;letter-spacing:.5px;white-space:nowrap}
+.su-tag.me{background:var(--acc);color:#1c1917}.su-tag.cpu{background:#ef4444;color:#fff}
+.su-kits{display:flex;gap:4px}
+.su-kits button{position:relative;min-height:44px;min-width:48px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.35);
+  color:var(--muted);font:700 13px var(--body);white-space:nowrap;cursor:pointer}
+.su-kits button.on{color:#fff;border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.14)}
+/* 고르면 상대와 색이 겹치는 유니폼: 빨간 점 · 골랐지만 자동으로 바뀐 유니폼: 빨간 점선 */
+.su-kits button.clash::after{content:"";position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--bad)}
+.su-kits button.want{border:1px dashed var(--bad);color:#fca5a5}
+.su-note{position:absolute;right:12px;top:62px;z-index:3;max-width:75%;padding:4px 10px;border-radius:9px;background:rgba(127,29,29,.88);
+  color:#fecaca;font:700 12px var(--body);text-align:right;pointer-events:none}
+.su-note:empty{display:none}
+.su-car{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 64px;touch-action:pan-y}
+.su-arrow{position:absolute;top:50%;transform:translateY(-50%);width:56px;height:88px;border-radius:16px;border:1px solid rgba(255,255,255,.25);padding:0;
+  background:rgba(0,0,0,.45);color:#fff;font:900 34px var(--body);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.su-arrow:active{transform:translateY(-50%) scale(.94);background:rgba(250,204,21,.25)}
+.su-arrow.l{left:8px}.su-arrow.r{right:8px}
+.su-card{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-width:0}
+.su-card.in-r{animation:suInR .28s ease-out}.su-card.in-l{animation:suInL .28s ease-out}
+@keyframes suInR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes suInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+.su-vis{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:clamp(110px,24vh,210px)}
+.su-vis svg{height:100%;width:auto;filter:drop-shadow(0 10px 18px rgba(0,0,0,.5))}
+.su-vis .su-crest{height:62%}
+.su-name{font:400 clamp(22px,3.2vw,34px) var(--title);text-align:center;line-height:1.1;margin-top:4px;max-width:100%}
+.su-sub{font:700 13px var(--body);color:var(--muted);display:flex;gap:8px;align-items:center}
+.su-ovr{font:900 13px var(--body);padding:3px 9px;border-radius:8px;background:rgba(255,255,255,.12);color:#fff}
+.su-stars{color:var(--acc);letter-spacing:1px}.su-stars span{opacity:.25}
+.su-stats{width:100%;max-width:340px;display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:6px}
+.su-stats b{font:700 13px var(--body);color:var(--muted)}
+.su-bar{height:9px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.su-bar i{display:block;height:100%;border-radius:9px;transition:width .35s}
+.su-stats em{font:900 14px var(--body);font-style:normal;min-width:24px;text-align:right}
+.su-style{margin-top:4px;font:700 12.5px var(--body);color:#e2e8f0;background:rgba(255,255,255,.07);padding:6px 12px;border-radius:999px;text-align:center}
+.su-list{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;padding:8px 12px 12px;border-top:1px solid var(--line);background:rgba(0,0,0,.25)}
+.su-list button{position:relative;min-height:62px;min-width:0;padding:5px 0 4px;border-radius:12px;border:2px solid transparent;background:rgba(255,255,255,.05);
+  background-clip:padding-box;color:var(--txt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:900 11px var(--body);
+  cursor:pointer;transition:transform .12s,background .15s}
+.su-list button svg{height:34px;width:auto}
+.su-list button.on{border-color:var(--acc);background-color:rgba(250,204,21,.16);transform:translateY(-2px)}
+.su-list button:disabled{opacity:.28;cursor:not-allowed}
+.su-list button:disabled::after{content:"상대";position:absolute;top:2px;right:3px;font:700 9px var(--body);color:#fca5a5}
+#suOpp .su-list button:disabled::after{content:"내 팀"}
+.su-list button:active{transform:scale(.94)}
+.su-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:110px}
+.su-vs{font:400 54px var(--title);color:var(--acc);text-shadow:0 4px 0 #1c1917,0 0 30px rgba(250,204,21,.4);line-height:1}
+.su-mini{width:104px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.35);padding:6px}
+.su-mini svg{width:100%;height:auto;display:block}
+.su-midlbl{font:700 11px var(--body);color:var(--muted);text-align:center}
+.su-swap{min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.4);color:#fff;font:700 13px var(--body);cursor:pointer;white-space:nowrap}
+.su-bottom{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,.8fr) minmax(0,.8fr) auto;gap:12px;align-items:end;
+  background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.su-bottom h3{margin:0 0 6px;font-size:13px;display:flex;gap:8px;align-items:baseline;min-width:0}
+.su-bottom h3 small{color:var(--acc);font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.su-bottom h3 small .mul{color:var(--muted)}
+.seg{display:flex;gap:5px}
+.seg button{flex:1;min-width:0;min-height:50px;padding:4px 2px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer;
+  font:700 13px var(--body);white-space:nowrap;letter-spacing:-.3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .seg button.sel{background:var(--acc);color:#1c1917;border-color:var(--acc)}
-/* 난이도 6단계: 넓은 화면은 한 줄, 좁은 화면은 3칸 × 2줄 */
-.diff-h{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:12px;row-gap:2px}
-.diff-seg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
-.diff-seg button{min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 2px;white-space:nowrap;min-width:0}
-.diff-seg .dn{font-size:15px;line-height:1.1}
-/* 넓은 화면: 난이도 · 경기 시간 · 닉네임을 한 줄에 */
-@media (min-width:900px){
-  .setup-grid{display:grid;grid-template-columns:minmax(0,2.75fr) minmax(0,2fr);column-gap:14px;align-items:start}
-  .setup-grid .setup-row{flex-wrap:nowrap}.setup-grid .setup-row>*{flex:1 1 0;min-width:0}
-  .diff-seg{gap:5px} .diff-seg .dn{font-size:14px;letter-spacing:-.3px}}
-.pips{display:flex;gap:3px}.pips i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18)}
-.pips i.on{background:#4ade80}.diff-seg button.sel .pips i{background:rgba(28,25,23,.25)}.diff-seg button.sel .pips i.on{background:#1c1917}
-.diff-desc{font-size:13px;font-weight:700;color:#e2e8f0;letter-spacing:0}
-.diff-desc b{color:var(--acc);font-weight:800;margin-right:5px}.diff-desc .mul{color:var(--muted);font-weight:700;white-space:nowrap}
-@media (max-width:640px){.diff-seg{grid-template-columns:repeat(3,minmax(0,1fr))}}
-input.txt{width:100%;min-height:48px;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
+.pips{display:flex;gap:2px}.pips i{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.35}.pips i.on{opacity:1}
+input.txt{width:100%;min-height:50px;padding:0 14px;border-radius:11px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--txt);
   font:700 16px var(--body);outline:none;-webkit-user-select:text;user-select:text}
 input.txt:focus{border-color:var(--acc)}
-.vs{margin-top:12px;text-align:center;font-weight:800;font-size:16px;color:#e2e8f0}
-.vs b{color:var(--acc)}.vs .nw{white-space:nowrap}
+.su-kick{min-height:64px;padding:0 34px;border:none;border-radius:16px;background:linear-gradient(180deg,#fde047,#eab308);color:#1c1917;cursor:pointer;
+  font:400 26px var(--title);box-shadow:0 8px 26px rgba(234,179,8,.45);white-space:nowrap}
+.su-kick:active{transform:scale(.97)}
+/* 세로 태블릿: VS 줄을 위로, 옵션은 두 줄 */
+@media (max-aspect-ratio:1/1){
+  .su-match{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr}
+  .su-mid{grid-column:1/3;grid-row:1;flex-direction:row;width:auto;gap:18px}
+  .su-mid .su-mini{width:120px}
+  .su-vs{font-size:40px}
+  .su-car{padding:4px 50px}
+  .su-arrow{width:44px;height:72px;font-size:28px;top:38%}
+  .su-vis{height:clamp(100px,14vh,170px)}
+  .su-vis .su-crest{height:48%}
+  .su-bottom{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .su-diff,.su-kick{grid-column:1/3}
+  .su-match{gap:10px}
+  /* 좁은 카드에서도 팀 버튼 폭 44px 이상: 간격 대신 투명 테두리로 띄웁니다 */
+  .su-list{gap:0;padding:6px 4px 8px}.su-list button{min-height:56px;border-width:3px}.su-list button svg{height:30px}.su-list button span{font-size:10px}
+}
+/* 세로 휴대폰: 카드를 위아래로 쌓고, 팀 목록은 4칸 × 2줄 (버튼 44px 이상) */
+@media (max-aspect-ratio:1/1) and (max-width:600px){
+  .su-wrap{gap:10px}
+  .su-top h2{font-size:24px}
+  .su-match{flex:none;grid-template-columns:minmax(0,1fr);grid-template-rows:none;gap:10px}
+  .su-car{flex:none}
+  .su-mid{grid-column:1;gap:12px}
+  .su-vs{font-size:32px}.su-mid .su-mini{width:90px}.su-midlbl{display:none}
+  .su-car{padding:4px 54px}
+  .su-arrow{top:50%;height:64px}
+  .su-vis{height:84px}
+  .su-name{font-size:24px}
+  .su-stats,.su-style{display:none}
+  .su-note{top:58px}
+  .su-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.su-list button{min-height:46px;flex-direction:row;gap:6px}
+  .su-list button svg{height:28px}.su-list button span{font-size:11px}
+  .su-bottom{padding:10px}
+  #segDiff{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .su-kick{min-height:56px;font-size:24px}
+}
+/* 가로 휴대폰 (낮은 화면): 능력치 막대는 숨기고 한 화면에 */
+@media (max-height:460px){
+  .su-wrap{gap:8px}
+  .su-top h2{font-size:22px}
+  .su-match{gap:8px}
+  .su-head{padding:6px 8px 0 12px}
+  .su-note{top:52px;font-size:11px}
+  .su-car{padding:2px 56px}
+  .su-arrow{width:48px;height:64px;font-size:28px}
+  .su-vis{height:64px}.su-stats,.su-style,.su-sub{display:none}
+  .su-name{font-size:21px;margin-top:0}
+  .su-list{gap:0;padding:2px 4px 4px}.su-list button{min-height:44px;padding:2px 0;border-width:3px}.su-list button svg{height:24px}.su-list button span{display:none}
+  .su-list button.on{transform:none}
+  .su-mid{width:76px;gap:8px}.su-vs{font-size:34px}.su-mini{width:72px;padding:4px}.su-midlbl,.su-swap{display:none}
+  .su-bottom{grid-template-columns:minmax(0,2.1fr) minmax(0,.95fr) minmax(0,.75fr) auto;padding:6px 10px 8px;gap:8px}
+  .su-bottom h3{margin-bottom:4px;font-size:12px}
+  .seg button{min-height:44px;font-size:11px;letter-spacing:-.5px;gap:3px}
+  input.txt{min-height:44px}.su-kick{min-height:48px;font-size:20px;padding:0 18px}
+}
 /* 도움말 */
 table.ctl{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
 table.ctl th,table.ctl td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -203,31 +293,18 @@ body.touch .icon-btn svg{width:26px;height:26px}
   animation:hintFade 6s forwards}
 @keyframes hintFade{0%,75%{opacity:1}100%{opacity:0;visibility:hidden}}
 @media (orientation:portrait) and (max-width:600px){#rotHint{display:block}}
-/* 킥오프 버튼 줄: 스크롤해도 아래에 붙어 있고, 뒤의 내용이 비치지 않도록 불투명 배경 */
-/* bottom 을 화면 아래 여백만큼 음수로 두어, 스크롤 중에도 버튼 아래로 팀 카드가 비쳐 보이지 않게 합니다 */
-.kick-bar{position:sticky;bottom:0;bottom:calc(0px - var(--scr-pb, 16px));z-index:2;margin:14px -22px -22px;padding:4px 22px 16px;background:#0a1711;border-radius:0 0 20px 20px;
-  box-shadow:0 -14px 14px -4px #0a1711}
 .show-sm{display:none}
-@media (max-width:760px){.teams{grid-template-columns:repeat(2,1fr)} .logo{font-size:52px}}
+@media (max-width:760px){.logo{font-size:52px}}
 @media (max-width:520px){.panel{padding:16px;border-radius:16px} h2{font-size:23px} .hide-sm{display:none} .show-sm{display:inline}
-  .kick-bar{margin:0 -16px -16px;padding:4px 16px 12px;border-radius:0 0 16px 16px}
   table.rank th,table.rank td{padding:8px 5px;font-size:13px}
   table.rank td.nk{max-width:96px;overflow:hidden;text-overflow:ellipsis}}
-/* 작은 화면: 설정(난이도·시간·닉네임)을 팀 목록보다 먼저, 팀 카드는 간단히 */
-@media (max-width:760px),(max-height:520px){
-  #scr-setup .panel{display:flex;flex-direction:column}
-  #scr-setup .phead{order:-2} #scr-setup .setup-grid{order:-1}
-  .team-card{padding:7px 8px;gap:5px} .team-card .bar{display:none} .kit{width:24px;height:24px;border-width:3px}
-  .stats{gap:4px}}
 /* 가로 휴대폰 등 낮은 화면: 모달·메뉴를 한 화면에 들어오게 */
 @media (max-height:520px){
   .screen{--scr-pb:max(8px, env(safe-area-inset-bottom, 0px));padding:8px;padding-top:max(8px, env(safe-area-inset-top, 0px));padding-bottom:var(--scr-pb);
     padding-left:max(8px, env(safe-area-inset-left, 0px));padding-right:max(8px, env(safe-area-inset-right, 0px))}
   .panel{padding:12px 16px;border-radius:14px}
-  .kick-bar{margin:0 -16px -12px;padding:2px 16px 10px;border-radius:0 0 14px 14px}
   h2{font-size:21px} h3{margin:8px 0 5px}
   .btn{padding:9px 12px;font-size:15px;margin-top:7px;border-radius:11px} .btn.big{font-size:17px;padding:10px 12px}
-  .seg button{padding:8px 6px} .diff-seg button{min-height:48px;gap:4px} .diff-desc{font-size:12.5px}
   .title-panel{padding:14px 18px 12px} .logo{font-size:42px} .ball-ico{width:42px;height:42px} .logo-sub{margin-bottom:8px} .foot{margin-top:8px}
   #halfStats,#resStats{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
   .statrow{margin:4px 0}
@@ -280,29 +357,48 @@ body.touch .icon-btn svg{width:26px;height:26px}
 
 <!-- 경기 설정 -->
 <div id="scr-setup" class="screen hidden">
-  <div class="panel wide">
-    <div class="phead"><button class="back" data-back="title">‹ 뒤로</button><h2>경기 설정</h2></div>
-    <h3>내 팀</h3>
-    <div class="teams" id="myTeams"></div>
-    <h3>상대 팀</h3>
-    <div class="teams" id="oppTeams"></div>
-    <div class="setup-grid">
-    <div class="diff-block">
-      <h3 class="diff-h"><span>난이도</span><span class="diff-desc" id="diffDesc" aria-live="polite"></span></h3>
-      <div class="seg diff-seg" id="segDiff" role="radiogroup" aria-label="난이도"></div>
-    </div>
-    <div class="row setup-row">
-      <div><h3>경기 시간 (실제 시간)</h3>
-        <div class="seg" id="segTime"><button data-v="2">2분</button><button data-v="4" class="sel">4분</button><button data-v="6">6분</button></div>
+  <div class="su-wrap">
+    <div class="su-top"><button class="back" data-back="title">‹ 뒤로</button><h2>경기 설정</h2></div>
+    <div class="su-match">
+      <section class="su-side" id="suMy" aria-label="내 팀">
+        <div class="su-glow"></div>
+        <div class="su-head"><span class="su-tag me">내 팀</span>
+          <div class="su-kits" role="group" aria-label="내 팀 유니폼"><button type="button" data-k="home">홈</button><button type="button" data-k="away">원정</button></div></div>
+        <div class="su-note" aria-live="polite"></div>
+        <div class="su-car">
+          <button type="button" class="su-arrow l" aria-label="이전 팀">‹</button>
+          <div class="su-card"></div>
+          <button type="button" class="su-arrow r" aria-label="다음 팀">›</button>
+        </div>
+        <div class="su-list" role="group" aria-label="내 팀 고르기"></div>
+      </section>
+      <div class="su-mid">
+        <div class="su-vs">VS</div>
+        <div class="su-mini" id="suMini" aria-hidden="true"></div>
+        <div class="su-midlbl">포메이션 2-3-1</div>
+        <button type="button" class="su-swap" id="btnSwap">⇄ 팀 바꾸기</button>
       </div>
-      <div><h3>닉네임</h3>
-        <input class="txt" id="nick" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" spellcheck="false">
-      </div>
+      <section class="su-side" id="suOpp" aria-label="상대 팀 (컴퓨터)">
+        <div class="su-glow"></div>
+        <div class="su-head"><span class="su-tag cpu">상대 (컴퓨터)</span>
+          <div class="su-kits" role="group" aria-label="상대 유니폼"><button type="button" data-k="auto">자동</button><button type="button" data-k="home">홈</button><button type="button" data-k="away">원정</button></div></div>
+        <div class="su-note" aria-live="polite"></div>
+        <div class="su-car">
+          <button type="button" class="su-arrow l" aria-label="이전 팀">‹</button>
+          <div class="su-card"></div>
+          <button type="button" class="su-arrow r" aria-label="다음 팀">›</button>
+        </div>
+        <div class="su-list" role="group" aria-label="상대 팀 고르기"></div>
+      </section>
     </div>
-    </div>
-    <div class="kick-bar">
-      <div class="vs" id="vsLine"></div>
-      <button class="btn primary big" id="btnKick">킥오프!</button>
+    <div class="su-bottom">
+      <div class="su-diff"><h3><span>난이도</span><small id="diffDesc" aria-live="polite"></small></h3>
+        <div class="seg" id="segDiff" role="radiogroup" aria-label="난이도"></div></div>
+      <div><h3>경기 시간</h3>
+        <div class="seg" id="segTime"><button type="button" data-v="2">2분</button><button type="button" data-v="4" class="sel">4분</button><button type="button" data-v="6">6분</button></div></div>
+      <div><h3><label for="nick">닉네임</label></h3>
+        <input class="txt" id="nick" maxlength="12" placeholder="최대 12자" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>
+      <button type="button" class="su-kick" id="btnKick">킥오프 ▶</button>
     </div>
   </div>
 </div>
@@ -470,16 +566,16 @@ var VIEW_OUT_X = 125, VIEW_OUT_Y = 115;
 var FEINT_T = 0.45, FEINT_CD = 2.0; // 개인기(C): 순간 가속·태클 면역 시간, 쿨타임
 var SLIDE_CD = 1.5;
 
-// 가상 팀 (실존 구단/선수와 무관)
+// 가상 팀 (실존 구단/선수와 무관). style: 경기 설정 화면에 보이는 팀 특징 한 줄
 var TEAMS = [
-  { name: '성모 FC',        abbr: 'SMF', home: ['#1d4ed8', '#facc15'], away: ['#f8fafc', '#1d4ed8'], gk: '#a3e635', att: 84, def: 83, spd: 82 },
-  { name: '한강 유나이티드', abbr: 'HGU', home: ['#dc2626', '#ffffff'], away: ['#111827', '#ef4444'], gk: '#22d3ee', att: 83, def: 79, spd: 85 },
-  { name: '푸른별 시티',    abbr: 'PBC', home: ['#38bdf8', '#0c4a6e'], away: ['#0c4a6e', '#7dd3fc'], gk: '#f472b6', att: 87, def: 76, spd: 83 },
-  { name: '백두 타이거즈',  abbr: 'BDT', home: ['#f97316', '#111827'], away: ['#111827', '#f97316'], gk: '#a78bfa', att: 79, def: 87, spd: 78 },
-  { name: '은하 로버스',    abbr: 'EHR', home: ['#7c3aed', '#f5f3ff'], away: ['#ede9fe', '#6d28d9'], gk: '#fde047', att: 80, def: 78, spd: 89 },
-  { name: '청솔 워리어스',  abbr: 'CSW', home: ['#eab308', '#14532d'], away: ['#14532d', '#fde047'], gk: '#fb7185', att: 78, def: 84, spd: 81 },
-  { name: '바다 갈매기',    abbr: 'BDG', home: ['#f8fafc', '#0d9488'], away: ['#0d9488', '#f8fafc'], gk: '#f59e0b', att: 76, def: 85, spd: 82 },
-  { name: '불꽃 레인저스',  abbr: 'BKR', home: ['#9f1239', '#fda4af'], away: ['#fda4af', '#9f1239'], gk: '#38bdf8', att: 89, def: 73, spd: 84 }
+  { name: '성모 FC',        abbr: 'SMF', home: ['#1d4ed8', '#facc15'], away: ['#f8fafc', '#1d4ed8'], gk: '#a3e635', att: 84, def: 83, spd: 82, style: '균형 잡힌 팀 · 짧은 패스' },
+  { name: '한강 유나이티드', abbr: 'HGU', home: ['#dc2626', '#ffffff'], away: ['#111827', '#ef4444'], gk: '#22d3ee', att: 83, def: 79, spd: 85, style: '빠른 역습' },
+  { name: '푸른별 시티',    abbr: 'PBC', home: ['#38bdf8', '#0c4a6e'], away: ['#0c4a6e', '#7dd3fc'], gk: '#f472b6', att: 87, def: 76, spd: 83, style: '공격 축구 · 강한 슈팅' },
+  { name: '백두 타이거즈',  abbr: 'BDT', home: ['#f97316', '#111827'], away: ['#111827', '#f97316'], gk: '#a78bfa', att: 79, def: 87, spd: 78, style: '철벽 수비' },
+  { name: '은하 로버스',    abbr: 'EHR', home: ['#7c3aed', '#f5f3ff'], away: ['#ede9fe', '#6d28d9'], gk: '#fde047', att: 80, def: 78, spd: 89, style: '스피드 · 측면 돌파' },
+  { name: '청솔 워리어스',  abbr: 'CSW', home: ['#eab308', '#14532d'], away: ['#14532d', '#fde047'], gk: '#fb7185', att: 78, def: 84, spd: 81, style: '끈질긴 압박' },
+  { name: '바다 갈매기',    abbr: 'BDG', home: ['#f8fafc', '#0d9488'], away: ['#0d9488', '#f8fafc'], gk: '#f59e0b', att: 76, def: 85, spd: 82, style: '조직적인 수비' },
+  { name: '불꽃 레인저스',  abbr: 'BKR', home: ['#9f1239', '#fda4af'], away: ['#fda4af', '#9f1239'], gk: '#38bdf8', att: 89, def: 73, spd: 84, style: '화끈한 공격력' }
 ];
 
 // 포메이션 2-3-1 (GK 포함 7명). x: 0=우리 골대 → 1=상대 골대, y: 0~1 (공격 방향 기준 왼쪽→오른쪽)
@@ -809,6 +905,10 @@ window.addEventListener('keydown', function (e) {
     }
     return;
   }
+  // 경기 설정 화면: ←/→ 로 내 팀 바꾸기 (닉네임 입력 중에는 위에서 이미 빠져나감)
+  if (current === 'setup' && G.mode !== 'match' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    e.preventDefault(); stepTeam('my', e.key === 'ArrowLeft' ? -1 : 1); return;
+  }
   var a = keyAction(e);
   if (!a) return;
   if (G.mode === 'match' && !G.paused) {
@@ -1018,24 +1118,28 @@ function makePlayer(team, f, i) {
 function kitContrast(a, b) {
   return colorDist(a.shirt, b.shirt) + Math.abs(lum(a.shirt) - lum(b.shirt)) * 160 + colorDist(a.trim, b.trim) * 0.25;
 }
-function pickKits(defA, defB) {
-  // 우선순위: (홈,홈) → (홈,원정) → (원정,홈) → (원정,원정). 충분히 구분되면 그 조합 사용, 아니면 가장 잘 구분되는 조합.
-  var combos = [[false, false], [false, true], [true, false], [true, true]], best = null, bs = -1;
-  for (var i = 0; i < combos.length; i++) {
-    var ka = makeKit(defA, combos[i][0]), kb = makeKit(defB, combos[i][1]);
-    var c = kitContrast(ka, kb);
-    if (defA !== defB || combos[i][0] !== combos[i][1]) {
-      if (c >= 240) { best = [ka, kb]; break; }
-      if (c > bs) { bs = c; best = [ka, kb]; }
-    }
+var KIT_OK = 240; // kitContrast 가 이 이상이면 두 유니폼이 충분히 구분됩니다
+// 유니폼 정하기. prefA: 내 팀 'home'|'away', prefB: 상대 'auto'|'home'|'away' (없으면 홈 · 자동)
+// 우선순위: 고른 유니폼 그대로 → 상대 유니폼 바꾸기 → 내 유니폼 바꾸기. 구분되는 조합이 없으면 가장 잘 구분되는 조합.
+// 자동(홈·자동)일 때 순서는 (홈,홈) → (홈,원정) → (원정,홈) → (원정,원정).
+function resolveKits(defA, defB, prefA, prefB) {
+  var as = prefA === 'away' ? ['away', 'home'] : ['home', 'away'];
+  var bs = prefB === 'away' ? ['away', 'home'] : ['home', 'away'];
+  var best = null, bc = -1;
+  search: for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) {
+    var ka = makeKit(defA, as[i] === 'away'), kb = makeKit(defB, bs[j] === 'away'), c = kitContrast(ka, kb);
+    if (c > bc) { bc = c; best = { a: as[i], b: bs[j], ka: ka, kb: kb }; }
+    if (c >= KIT_OK) break search;
   }
-  return best;
-}
-function setupTeams(defA, defB, aiA, aiB, humanA) {
-  var kits = pickKits(defA, defB), kitA = kits[0], kitB = kits[1];
+  // 골키퍼 유니폼도 서로, 그리고 필드 선수와 겹치지 않게
+  var kitA = best.ka, kitB = best.kb;
   if (colorDist(kitA.gk, kitB.gk) < 90) kitB.gk = '#e5e7eb';
   if (colorDist(kitB.gk, kitA.shirt) < 90 || colorDist(kitB.gk, kitB.shirt) < 90) kitB.gk = '#e5e7eb';
   if (colorDist(kitA.gk, kitB.shirt) < 90 || colorDist(kitA.gk, kitA.shirt) < 90) kitA.gk = '#fb923c';
+  return best;
+}
+function setupTeams(defA, defB, aiA, aiB, humanA, prefA, prefB) {
+  var kits = resolveKits(defA, defB, prefA, prefB), kitA = kits.ka, kitB = kits.kb;
   var A = makeTeam(defA, 0, humanA, aiA, kitA), B = makeTeam(defB, 1, false, aiB, kitB);
   A.opp = B; B.opp = A;
   G.teams = [A, B]; G.players = []; G.drawList = [];
@@ -3357,60 +3461,162 @@ function goBack() {
   goScreen(tgt === 'help' || tgt === 'rank' ? 'title' : tgt);
 }
 
-var setup = { my: 0, opp: 1, diff: normDiff(lsGet('seongmoSoccer.diff', DIFF_DEFAULT)), min: 4 };
+// 경기 설정. kitMy: 'home'|'away', kitOpp: 'auto'|'home'|'away' (실제로 입는 유니폼은 resolveKits 가 정합니다)
+var setup = { my: 0, opp: 1, diff: normDiff(lsGet('seongmoSoccer.diff', DIFF_DEFAULT)), min: 4, kitMy: 'home', kitOpp: 'auto' };
+var KIT_NAME = { home: '홈', away: '원정' };
 function diffButton(name, lv) {
   var b = el('button');
   b.type = 'button'; b.setAttribute('data-v', name); b.setAttribute('role', 'radio');
   b.title = name + ' · ' + DIFF_DESC[name];
-  b.appendChild(el('span', 'dn', name));
+  b.appendChild(el('span', '', name));
   var pp = el('span', 'pips');
   for (var k = 0; k < DIFF_ORDER.length; k++) pp.appendChild(el('i', k <= lv ? 'on' : ''));
   b.appendChild(pp);
   return b;
 }
-function teamCard(i, which) {
-  var t = TEAMS[i], b = el('button', 'team-card');
-  b.type = 'button';
-  var top = el('div', 'tc-top'), kit = el('span', 'kit');
-  kit.style.background = t.home[0]; kit.style.borderColor = t.home[1];
-  var nm = el('div'); nm.style.minWidth = '0';
-  nm.appendChild(el('div', 'tn', t.name)); nm.appendChild(el('div', 'ta', t.abbr));
-  top.appendChild(kit); top.appendChild(nm); b.appendChild(top);
-  var st = [['공격', t.att], ['수비', t.def], ['속도', t.spd]], stats = el('div', 'stats');
-  for (var k = 0; k < st.length; k++) {
-    var row = el('div', 'st'), lab = el('span');
-    lab.appendChild(document.createTextNode(st[k][0])); lab.appendChild(el('b', '', String(st[k][1])));
-    var bar = el('div', 'bar'), fill = el('i'); fill.style.width = clamp((st[k][1] - 60) / 35 * 100, 5, 100) + '%';
-    bar.appendChild(fill); row.appendChild(lab); row.appendChild(bar);
-    stats.appendChild(row);
+// 유니폼 그림 (SVG). 무늬는 경기 중 선수 그림과 같은 KIT_PAT 을 따릅니다.
+var svgSeq = 0;
+function jerseySvg(k, pat, num) {
+  var s = k.shirt, t = k.trim, id = 'suj' + (++svgSeq), p = '', i;
+  if (pat === 1) for (i = 0; i < 4; i++) p += '<rect x="' + (30 + i * 22) + '" y="0" width="9" height="150" fill="' + t + '" opacity=".85"/>'; // 세로 줄무늬
+  else if (pat === 2) p = '<path d="M20 20 L50 20 L140 130 L110 130Z" fill="' + t + '" opacity=".9"/>';                                            // 어깨띠
+  else if (pat === 3) p = '<rect x="0" y="52" width="160" height="22" fill="' + t + '" opacity=".9"/>';                                                // 가슴 가로띠
+  else if (pat === 4) p = '<path d="M36 14 L80 62 L124 14 L124 30 L80 80 L36 30Z" fill="' + t + '" opacity=".9"/>';                                  // V 무늬
+  else if (pat === 5) for (i = 0; i < 4; i++) p += '<rect x="0" y="' + (34 + i * 24) + '" width="160" height="9" fill="' + t + '" opacity=".85"/>'; // 가로 줄무늬
+  else if (pat === 6) for (i = 0; i < 6; i++) p += '<rect x="' + (34 + i * 18) + '" y="0" width="3" height="150" fill="' + t + '" opacity=".8"/>';   // 핀 스트라이프
+  var body = 'M52 6 Q80 22 108 6 L150 26 L136 62 L120 56 L120 142 Q80 150 40 142 L40 56 L24 62 L10 26Z';
+  return '<svg class="su-jersey" viewBox="0 0 160 150" aria-hidden="true"><defs><clipPath id="' + id + '"><path d="' + body + '"/></clipPath>' +
+    '<linearGradient id="' + id + 'g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs>' +
+    '<g clip-path="url(#' + id + ')"><rect width="160" height="150" fill="' + s + '"/>' + p +
+    '<rect x="10" y="20" width="30" height="44" fill="' + t + '" opacity=".95" transform="rotate(-8 25 40)"/><rect x="120" y="20" width="30" height="44" fill="' + t + '" opacity=".95" transform="rotate(8 135 40)"/>' +
+    '<rect width="160" height="150" fill="url(#' + id + 'g)"/></g>' +
+    '<path d="M52 6 Q80 22 108 6" fill="none" stroke="' + t + '" stroke-width="7"/>' +
+    '<path d="' + body + '" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="2.5"/>' +
+    '<text x="80" y="112" text-anchor="middle" font-family="Black Han Sans,Noto Sans KR,sans-serif" font-size="46" fill="' + k.num + '" stroke="' +
+    (lum(s) > 0.6 ? 'rgba(255,255,255,.4)' : 'rgba(0,0,0,.35)') + '" stroke-width="1.5">' + num + '</text></svg>';
+}
+// 엠블럼 (항상 홈 색)
+function crestSvg(t, cls) {
+  var s = t.home[0], tr = t.home[1], tc = lum(s) > 0.6 ? '#0f172a' : '#fff';
+  return '<svg' + (cls ? ' class="' + cls + '"' : '') + ' viewBox="0 0 100 118" aria-hidden="true"><path d="M50 4 L94 18 L90 70 Q84 100 50 114 Q16 100 10 70 L6 18Z" fill="' + tr + '" stroke="rgba(0,0,0,.4)" stroke-width="3"/>' +
+    '<path d="M50 13 L85 24 L82 68 Q77 93 50 104 Q23 93 18 68 L15 24Z" fill="' + s + '"/>' +
+    '<circle cx="50" cy="40" r="11" fill="none" stroke="' + tc + '" stroke-width="3" opacity=".9"/><path d="M50 29 L54 37 L50 51 L46 37Z" fill="' + tc + '" opacity=".9"/>' +
+    '<text x="50" y="82" text-anchor="middle" font-family="Black Han Sans,Noto Sans KR,sans-serif" font-size="22" fill="' + tc + '">' + t.abbr + '</text></svg>';
+}
+function teamOvr(t) { return Math.round((t.att + t.def + t.spd) / 3); }
+function starsHtml(o) { var n = o >= 84 ? 5 : o >= 82 ? 4 : 3; return '★★★★★'.slice(0, n) + '<span>' + '★★★★★'.slice(n) + '</span>'; }
+function statRowHtml(lbl, v, c) { return '<b>' + lbl + '</b><div class="su-bar"><i style="width:' + clamp((v - 60) / 35 * 100, 5, 100) + '%;background:' + c + '"></i></div><em>' + v + '</em>'; }
+function suSide(which) { return $(which === 'my' ? 'suMy' : 'suOpp'); }
+function renderSide(which, idx, kit, dir) {
+  var t = TEAMS[idx], side = suSide(which), card = side.querySelector('.su-card'), o = teamOvr(t);
+  card.className = 'su-card';
+  if (dir) { void card.offsetWidth; card.className = 'su-card ' + (dir > 0 ? 'in-r' : 'in-l'); } // 애니메이션 다시 시작
+  card.innerHTML = '<div class="su-vis">' + crestSvg(t, 'su-crest') + jerseySvg(kit, KIT_PAT[t.abbr] || 0, which === 'my' ? 10 : 9) + '</div>' +
+    '<div class="su-name">' + t.name + '</div>' +
+    '<div class="su-sub"><span class="su-ovr">종합 ' + o + '</span><span class="su-stars" aria-label="별 ' + (o >= 84 ? 5 : o >= 82 ? 4 : 3) + '개">' + starsHtml(o) + '</span></div>' +
+    '<div class="su-stats">' + statRowHtml('공격', t.att, '#f87171') + statRowHtml('수비', t.def, '#60a5fa') + statRowHtml('스피드', t.spd, '#4ade80') + '</div>' +
+    '<div class="su-style">' + t.style + '</div>';
+  side.querySelector('.su-glow').style.background = 'radial-gradient(ellipse at 50% 30%,' + kit.shirt + '66,transparent 65%)';
+  var other = which === 'my' ? setup.opp : setup.my, bs = side.querySelector('.su-list').children;
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].classList.toggle('on', i === idx);
+    bs[i].setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+    bs[i].disabled = i === other;
   }
-  b.appendChild(stats);
-  b.title = t.name + ' · 공격 ' + t.att + ' / 수비 ' + t.def + ' / 속도 ' + t.spd;
-  b.addEventListener('click', function () {
-    if (which === 'my') { setup.my = i; if (setup.opp === i) setup.opp = (i + 1) % TEAMS.length; }
-    else if (i !== setup.my) setup.opp = i;
-    renderSetup();
-  });
-  return b;
+}
+// 가운데 작은 경기장: 실제 유니폼 색 (골키퍼 포함)
+function renderMini(ka, kb) {
+  var s = '<svg viewBox="0 0 100 64"><rect width="100" height="64" rx="3" fill="#166534"/>' +
+    '<g fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".8"><rect x="1" y="1" width="98" height="62"/><line x1="50" y1="1" x2="50" y2="63"/><circle cx="50" cy="32" r="8"/><rect x="1" y="18" width="12" height="28"/><rect x="87" y="18" width="12" height="28"/></g>';
+  for (var t = 0; t < 2; t++) {
+    var k = t ? kb : ka;
+    for (var i = 0; i < FORM.length; i++) {
+      var f = FORM[i], x = 4 + f.x / 0.6 * 43, y = 6 + f.y * 52;
+      s += '<circle cx="' + (t ? 100 - x : x).toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.2" fill="' + (f.role === 'GK' ? k.gk : k.shirt) + '" stroke="' + k.trim + '" stroke-width="1"/>';
+    }
+  }
+  $('suMini').innerHTML = s + '</svg>';
+}
+// 유니폼 버튼: on = 실제로 입는 유니폼, clash = 고르면 색이 겹쳐 바뀌는 유니폼, want = 골랐지만 색이 겹쳐 바뀐 유니폼
+function renderKitButtons(which, r) {
+  var side = suSide(which), bs = side.querySelectorAll('.su-kits button'), my = which === 'my';
+  var pref = my ? setup.kitMy : setup.kitOpp, worn = my ? r.a : r.b, note = '';
+  for (var i = 0; i < bs.length; i++) {
+    var k = bs[i].getAttribute('data-k'), on, clash = false;
+    if (k === 'auto') { on = pref === 'auto'; bs[i].textContent = '자동 (' + KIT_NAME[resolveKits(TEAMS[setup.my], TEAMS[setup.opp], setup.kitMy, 'auto').b] + ')'; }
+    else {
+      on = pref === 'auto' ? false : worn === k;
+      var alt = my ? resolveKits(TEAMS[setup.my], TEAMS[setup.opp], k, setup.kitOpp).a : resolveKits(TEAMS[setup.my], TEAMS[setup.opp], setup.kitMy, k).b;
+      clash = alt !== k;
+    }
+    bs[i].classList.toggle('on', on);
+    bs[i].classList.toggle('clash', clash);
+    bs[i].classList.toggle('want', k === pref && k !== worn && k !== 'auto');
+    bs[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    bs[i].title = clash ? '상대와 색이 비슷해서 입을 수 없어요' : (k === 'auto' ? '상대와 겹치지 않는 유니폼을 자동으로' : KIT_NAME[k] + ' 유니폼');
+  }
+  if (pref !== 'auto' && pref !== worn) note = '색이 겹쳐서 ' + KIT_NAME[worn] + ' 유니폼으로 바꿨어요';
+  side.querySelector('.su-note').textContent = note;
 }
 var setupBuilt = false;
-function renderSetup() {
-  var my = $('myTeams'), op = $('oppTeams'), i;
-  if (!setupBuilt) {
-    for (i = 0; i < TEAMS.length; i++) { my.appendChild(teamCard(i, 'my')); op.appendChild(teamCard(i, 'opp')); }
-    for (i = 0; i < DIFF_ORDER.length; i++) $('segDiff').appendChild(diffButton(DIFF_ORDER[i], i));
-    setupBuilt = true;
-    $('nick').value = lsGet('seongmoSoccer.nick', '');
-  }
-  for (i = 0; i < TEAMS.length; i++) {
-    my.children[i].classList.toggle('sel', i === setup.my);
-    op.children[i].classList.toggle('sel', i === setup.opp);
-    op.children[i].classList.toggle('dis', i === setup.my);
-    op.children[i].setAttribute('aria-disabled', i === setup.my ? 'true' : 'false');
-    my.children[i].setAttribute('aria-pressed', i === setup.my ? 'true' : 'false');
-    op.children[i].setAttribute('aria-pressed', i === setup.opp ? 'true' : 'false');
-  }
-  var segs = [['segDiff', setup.diff], ['segTime', String(setup.min)]];
+function buildSetup() {
+  var sides = ['my', 'opp'];
+  for (var s = 0; s < sides.length; s++) (function (which) {
+    var side = suSide(which), list = side.querySelector('.su-list');
+    for (var i = 0; i < TEAMS.length; i++) (function (n) {
+      var b = el('button');
+      b.type = 'button'; b.title = TEAMS[n].name; b.setAttribute('aria-label', TEAMS[n].name);
+      b.innerHTML = crestSvg(TEAMS[n]) + '<span>' + TEAMS[n].abbr + '</span>';
+      b.addEventListener('click', function () { pickTeam(which, n); });
+      list.appendChild(b);
+    })(i);
+    side.querySelector('.su-arrow.l').addEventListener('click', function () { stepTeam(which, -1); });
+    side.querySelector('.su-arrow.r').addEventListener('click', function () { stepTeam(which, 1); });
+    var kb = side.querySelectorAll('.su-kits button');
+    for (i = 0; i < kb.length; i++) (function (b) {
+      b.addEventListener('click', function () {
+        if (which === 'my') setup.kitMy = b.getAttribute('data-k'); else setup.kitOpp = b.getAttribute('data-k');
+        renderSetup();
+      });
+    })(kb[i]);
+    // 좌우로 밀어서 팀 바꾸기 (화살표 버튼 위에서 시작한 터치는 버튼 탭으로 처리)
+    var car = side.querySelector('.su-car'), sw = null;
+    car.addEventListener('pointerdown', function (e) {
+      sw = (e.target.closest && e.target.closest('.su-arrow')) ? null : { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+    car.addEventListener('pointerup', function (e) {
+      if (!sw || sw.id !== e.pointerId) return;
+      var dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) stepTeam(which, dx < 0 ? 1 : -1);
+    });
+    car.addEventListener('pointercancel', function () { sw = null; });
+  })(sides[s]);
+  for (var d = 0; d < DIFF_ORDER.length; d++) $('segDiff').appendChild(diffButton(DIFF_ORDER[d], d));
+  $('btnSwap').addEventListener('click', function () { var t = setup.my; setup.my = setup.opp; setup.opp = t; renderSetup(1, -1); });
+  $('nick').value = lsGet('seongmoSoccer.nick', '');
+  setupBuilt = true;
+}
+// 팀 고르기: 상대가 고른 팀은 고를 수 없고, 화살표·밀기는 그 팀을 건너뜁니다
+function pickTeam(which, n) {
+  var cur = which === 'my' ? setup.my : setup.opp, other = which === 'my' ? setup.opp : setup.my;
+  if (n === cur || n === other) return;
+  if (which === 'my') setup.my = n; else setup.opp = n;
+  renderSetup(which === 'my' ? (n > cur ? 1 : -1) : 0, which === 'opp' ? (n > cur ? 1 : -1) : 0);
+}
+function stepTeam(which, d) {
+  var n = which === 'my' ? setup.my : setup.opp, other = which === 'my' ? setup.opp : setup.my;
+  do { n = (n + d + TEAMS.length) % TEAMS.length; } while (n === other);
+  if (which === 'my') setup.my = n; else setup.opp = n;
+  renderSetup(which === 'my' ? d : 0, which === 'opp' ? d : 0);
+}
+function renderSetup(dirMy, dirOpp) {
+  if (!setupBuilt) buildSetup();
+  var r = resolveKits(TEAMS[setup.my], TEAMS[setup.opp], setup.kitMy, setup.kitOpp);
+  renderSide('my', setup.my, r.ka, dirMy);
+  renderSide('opp', setup.opp, r.kb, dirOpp);
+  renderKitButtons('my', r); renderKitButtons('opp', r);
+  renderMini(r.ka, r.kb);
+  var segs = [['segDiff', setup.diff], ['segTime', String(setup.min)]], i;
   for (var s = 0; s < segs.length; s++) {
     var bs = $(segs[s][0]).children;
     for (i = 0; i < bs.length; i++) {
@@ -3419,14 +3625,9 @@ function renderSetup() {
       if (s === 0) bs[i].setAttribute('aria-checked', on ? 'true' : 'false');
     }
   }
-  var dd = $('diffDesc'); dd.textContent = '';
-  dd.appendChild(el('b', '', setup.diff));
-  dd.appendChild(document.createTextNode(DIFF_DESC[setup.diff] + ' '));
+  var dd = $('diffDesc'); dd.textContent = DIFF_DESC[setup.diff] + ' ';
   dd.appendChild(el('span', 'mul', '· 점수 ×' + DIFF_MULT[setup.diff]));
-  var vs = $('vsLine'); vs.textContent = '';
-  vs.appendChild(el('b', '', TEAMS[setup.my].name)); vs.appendChild(document.createTextNode('  VS  '));
-  vs.appendChild(el('span', '', TEAMS[setup.opp].name));
-  vs.appendChild(document.createTextNode('  ·  ')); vs.appendChild(el('span', 'nw', setup.diff + ' · ' + setup.min + '분'));
+  dd.title = setup.diff + ' · ' + DIFF_DESC[setup.diff] + ' · 점수 ×' + DIFF_MULT[setup.diff];
 }
 function cleanNick(v) {
   var s = String(v || '').replace(/[\u0000-\u001F\u007F]/g, '').replace(/\s+/g, ' ').trim();
@@ -3449,7 +3650,7 @@ function startMatch(cfg) {
   G.cfg = cfg; G.demo = false; G.mode = 'match'; G.paused = false; G.saved = false; G.saving = false;
   G.matchId++; // 이전 경기의 저장 응답이 늦게 도착해도 이 경기 상태를 건드리지 않도록 구분
   G.halfShownAt = 0;
-  setupTeams(TEAMS[cfg.my], TEAMS[cfg.opp], ALLY_AI, DIFFS[cfg.diff], true);
+  setupTeams(TEAMS[cfg.my], TEAMS[cfg.opp], ALLY_AI, DIFFS[cfg.diff], true, cfg.kitMy, cfg.kitOpp);
   G.half = 1; G.clock = 0; G.halfLen = cfg.min * 60 / 2; G.time = 0; G.matchT = 0; G.slowT = 0;
   G.toastT = 0; G.bannerT = 0;
   G.firstKick = Math.random() < 0.5 ? G.teams[0] : G.teams[1];
@@ -3623,7 +3824,7 @@ function bindUI() {
   $('btnKick').addEventListener('click', function () {
     var nick = cleanNick($('nick').value);
     lsSet('seongmoSoccer.nick', nick);
-    startMatch({ my: setup.my, opp: setup.opp, diff: setup.diff, min: setup.min, nick: nick });
+    startMatch({ my: setup.my, opp: setup.opp, diff: setup.diff, min: setup.min, nick: nick, kitMy: setup.kitMy, kitOpp: setup.kitOpp });
   });
   $('nick').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('btnKick').click(); } });
   $('btnPause').addEventListener('click', function () { Snd.init(); pauseGame(); });
