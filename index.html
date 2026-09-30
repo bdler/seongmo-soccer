@@ -3144,7 +3144,10 @@ function fmtClock() {
 function drawHUD() {
   var W = view.w, H = view.h, A = G.teams[0], B = G.teams[1];
   var sc = W < 520 ? 0.82 : (Math.min(W, H) >= 700 ? 1.15 : 1);
-  ctx.save(); ctx.translate(10 + safe.l, 10 + safe.t); ctx.scale(sc, sc);
+  // 점수판은 상단 가운데. 좁은 화면에서는 오른쪽 위 소리·일시정지 버튼과 겹치지 않도록 왼쪽으로 비켜 줍니다.
+  var bw = 300 * sc, btnW = G.touchMode ? 50 : 42, rightRes = 10 + safe.r + btnW * 2 + 8 + 10;
+  var bx = Math.max(10 + safe.l, Math.min((W - bw) / 2, W - rightRes - bw));
+  ctx.save(); ctx.translate(bx, 10 + safe.t); ctx.scale(sc, sc);
   rrect(0, 0, 300, 40, 10); ctx.fillStyle = 'rgba(6,14,10,0.84)'; ctx.fill();
   ctx.fillStyle = A.kit.shirt; ctx.fillRect(8, 9, 7, 22); ctx.fillStyle = A.kit.trim; ctx.fillRect(15, 9, 3, 22);
   ctx.fillStyle = B.kit.shirt; ctx.fillRect(178, 9, 7, 22); ctx.fillStyle = B.kit.trim; ctx.fillRect(175, 9, 3, 22);
