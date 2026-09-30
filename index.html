@@ -1008,7 +1008,7 @@ function makePlayer(team, f, i) {
     team: team, idx: i, role: f.role, num: f.num, bx: f.x, by: f.y,
     x: 0, y: 0, vx: 0, vy: 0, fx: team.dir, fy: 0, speed: sp, stamina: 1,
     desX: 0, desY: 0, desSprint: false,
-    kickCd: 0, tackleCd: 0, stun: 0, slideT: 0, slideCd: 0, slideHit: false, sdx: 0, sdy: 0,
+    kickCd: 0, tackleCd: 0, stun: 0, stunHit: false, slideT: 0, slideCd: 0, slideHit: false, sdx: 0, sdy: 0,
     diveT: 0, diveCd: 0, holding: false, holdT: 0, gkMiss: 0, react: 0, touchCd: 0, headerCd: 0, lungeT: 0,
     decT: 0, charge: 0, passCharge: 0, feintT: 0, feintCd: 0, receiveT: 0, dribY: CY, runX: 0, runY: 0, runT: 0, anim: Math.random() * 6,
     missT: 0, recvSmart: true, icpX: 0, icpY: 0
@@ -1581,7 +1581,7 @@ function tryTackle(d, c, bonus) {
   if (d.role === 'GK' && inOwnBox(d.team, ball.x, ball.y)) gkCatch(d);
   else if (Math.random() < 0.5) { setOwner(d); ball.kicker = c; ball.kickTime = G.time; }
   else looseBall(c, d, (ball.x - c.x) * 3 + d.fx * 90 + rand(-40, 40), (ball.y - c.y) * 3 + d.fy * 90 + rand(-40, 40));
-  c.stun = 0.3; c.tackleCd = 0.8; c.charge = 0; c.passCharge = 0;
+  c.stun = 0.3; c.stunHit = true; c.tackleCd = 0.8; c.charge = 0; c.passCharge = 0;
   if (!G.demo) d.team.stats.tackles++;
   if (G.human && d.team === G.human.team) toastSoft('태클 성공!', '#86efac');
   return true;
@@ -2309,17 +2309,17 @@ function movePlayer(p, dt) {
       var pr = clamp(0.72 + (p.team.def.def - c.team.def.att) / 150 + (p.team.ai.tackle - 1) * 0.15, 0.3, 0.92);
       if (Math.random() < pr) {
         looseBall(c, p, p.sdx * 260 + rand(-60, 60), p.sdy * 260 + rand(-60, 60));
-        c.stun = 0.6; c.charge = 0; c.passCharge = 0;
+        c.stun = 0.6; c.stunHit = true; c.charge = 0; c.passCharge = 0;
         if (!G.demo) p.team.stats.tackles++;
         if (G.human && p.team === G.human.team) toastSoft('슬라이딩 태클 성공!', '#86efac');
         Snd.kick(0.35);
       }
     }
-    if (p.slideT <= 0) { p.slideT = 0; p.stun = 0.35; }
+    if (p.slideT <= 0) { p.slideT = 0; p.stun = 0.35; p.stunHit = false; } // stunHit: 그림 전용 (태클당해 휘청일 때만 별)
   } else if (p.diveT > 0) {
     p.diveT -= dt;
     p.vx *= 1 - 2 * dt; p.vy *= 1 - 2 * dt;
-    if (p.diveT <= 0) { p.diveT = 0; p.stun = 0.3; }
+    if (p.diveT <= 0) { p.diveT = 0; p.stun = 0.3; p.stunHit = false; }
   } else if (p.stun > 0) {
     p.stun -= dt;
     p.vx *= 1 - Math.min(1, 7 * dt); p.vy *= 1 - Math.min(1, 7 * dt);
@@ -2774,7 +2774,8 @@ function drawGoalFront(s) {
 }
 /* ---- 선수 그리기: 위에서 내려다본 선수 (머리·머리카락·어깨·팔·다리·축구화) ----
  * 선수마다 로컬 좌표계(앞 = +x, 오른쪽 = +y)를 쓰고, 점은 직접 회전시켜 그립니다 (ctx.rotate 없음).
- * 명암 그라데이션은 회전하지 않는 좌표계에서 한 번만 만들어 두므로, 선수가 돌아도 빛은 늘 왼쪽 위에서 비칩니다. */
+ * 명암은 그라데이션 없이 단색 두 겹으로 냅니다: 어두운 색을 먼저 칠하고, 밝은 색을 왼쪽 위(빛 쪽)로 조금 옮겨 덧칠.
+ * (그라데이션은 소프트웨어 캔버스에서 한 프레임 전체를 크게 느리게 만들어서 쓰지 않습니다) */
 // 머리카락은 너무 까맣지 않게 (위에서 보면 머리가 몸 한가운데 검은 점처럼 보이지 않도록)
 var HAIR_COLS = ['#3a2616', '#4a2c17', '#5c3a1e', '#6e4424', '#8a5a2b', '#a4652c', '#d9b25f', '#2b211c', '#7c2f16', '#4f3a2a'];
 var SKIN_COLS = ['#f4d0ae', '#e8b78d', '#d39c6e', '#b07449', '#80502f'];
@@ -2783,16 +2784,12 @@ var BOOT_COLS = ['#0f172a', '#0f172a', '#f8fafc', '#0f172a', '#1f2937']; // 축�
 var KIT_PAT = { SMF: 1, HGU: 2, PBC: 3, BDT: 4, EHR: 5, CSW: 6, BDG: 4, BKR: 2 };
 var P_OUT = 'rgba(8,12,22,0.7)', P_SCALE = 1.15; // 그림만 조금 크게 (충돌 반경 PR 은 그대로)
 var PC = 1, PS = 0; // 지금 그리는 선수의 방향 (cos, sin)
+var DRIB_B = Math.sqrt((BR / P_SCALE) * (BR / P_SCALE) - 6.76); // 선수 로컬 단위: 공 중심에서 발끝이 닿는 곳까지 (발은 공 중심선에서 2.6 옆)
 var PO = { lfx: 0, lfy: 0, rfx: 0, rfy: 0, lhx: 0, lhy: 0, rhx: 0, rhy: 0 };
 function shadeHex(h, a) {
   var c = hexRgb(h), t = a < 0 ? 0 : 255, f = a < 0 ? -a : a;
   var n = (Math.round(c[0] + (t - c[0]) * f) << 16) | (Math.round(c[1] + (t - c[1]) * f) << 8) | Math.round(c[2] + (t - c[2]) * f);
   return '#' + (0x1000000 + n).toString(16).slice(1);
-}
-function litGrad(col, r, hi, lo) {
-  var g = ctx.createLinearGradient(-r * 0.75, -r, r * 0.6, r * 0.85);
-  g.addColorStop(0, shadeHex(col, hi)); g.addColorStop(0.5, col); g.addColorStop(1, shadeHex(col, -lo));
-  return g;
 }
 function pStyle(p) {
   var k = p.team.kit, gk = p.role === 'GK', shirt = gk ? k.gk : k.shirt, s = p._ps;
@@ -2806,11 +2803,11 @@ function pStyle(p) {
   var num = gk ? (lum(k.gk) > 0.6 ? '#0f172a' : '#ffffff') : k.num;
   var trimC = (colorDist(k.trim, shirt) < 70) ? (light ? '#0f172a' : '#f8fafc') : k.trim;
   s = p._ps = {
-    shirt: shirt, trim: k.trim, body: litGrad(shirt, 13, 0.42, 0.34), trimC: trimC,
+    shirt: shirt, trim: k.trim, body: shirt, bodyD: shadeHex(shirt, light ? -0.2 : -0.32), trimC: trimC,
     pat: gk ? 0 : (KIT_PAT[p.team.def.abbr] || 0),
-    shorts: litGrad(shorts, 13, 0.3, 0.35), sock: shadeHex(shirt, light ? -0.12 : -0.22),
-    skin: skin, skinG: litGrad(skin, 8, 0.28, 0.2), skinD: shadeHex(skin, -0.3),
-    hair: litGrad(hair, 8, lum(hair) < 0.25 ? 0.3 : 0.22, 0.3), style: (h >> 5) % 5,
+    shorts: shorts, sock: shadeHex(shirt, light ? -0.12 : -0.22),
+    skin: skin, skinD: shadeHex(skin, -0.3),
+    hair: hair, hairH: shadeHex(hair, lum(hair) < 0.25 ? 0.22 : 0.18), style: (h >> 5) % 5,
     boot: gk ? '#0f172a' : BOOT_COLS[(h >> 3) % BOOT_COLS.length],
     glove: gk ? (lum(k.gk) > 0.75 ? '#f97316' : '#f8fafc') : null,
     foot: ((h >> 4) & 3) === 0 ? -1 : 1, // 왼발잡이 약 1/4
@@ -2847,45 +2844,49 @@ function pArms(st, sx, sw) {
   var o = PO;
   ctx.strokeStyle = P_OUT; ctx.lineWidth = 5.2; ctx.beginPath();
   lM(sx, -sw); lL(o.lhx, o.lhy); lM(sx, sw); lL(o.rhx, o.rhy); ctx.stroke();
-  ctx.strokeStyle = st.skinG; ctx.lineWidth = 3.3; ctx.stroke();
+  ctx.strokeStyle = st.skin; ctx.lineWidth = 3.3; ctx.stroke();
   ctx.strokeStyle = st.body; ctx.lineWidth = 5.4; ctx.beginPath();
   lSeg(sx, -sw, o.lhx, o.lhy, 0, 0.3); lSeg(sx, sw, o.rhx, o.rhy, 0, 0.3); ctx.stroke();
   var r = st.glove ? 2.9 : 2.05;
-  ctx.fillStyle = st.glove || st.skinG; ctx.beginPath(); lDot(o.lhx, o.lhy, r); lDot(o.rhx, o.rhy, r); ctx.fill();
+  ctx.fillStyle = st.glove || st.skin; ctx.beginPath(); lDot(o.lhx, o.lhy, r); lDot(o.rhx, o.rhy, r); ctx.fill();
   ctx.lineWidth = 1; ctx.strokeStyle = P_OUT; ctx.stroke();
 }
 // 머리. dir: 얼굴 방향 (+1 앞), 머리카락은 반대쪽으로 치우칩니다.
 function pHead(st, hx, r, dir) {
   ctx.fillStyle = st.skinD; ctx.beginPath(); lDot(hx - 0.4 * dir, -r + 0.1, 1.25); lDot(hx - 0.4 * dir, r - 0.1, 1.25); ctx.fill();
-  ctx.fillStyle = st.skinG; ctx.beginPath(); lDot(hx, 0, r); ctx.fill();
+  ctx.beginPath(); lDot(hx, 0, r); ctx.fill(); // 그늘진 얼굴 (아래·오른쪽)
   ctx.lineWidth = 1; ctx.strokeStyle = P_OUT; ctx.stroke();
+  ctx.fillStyle = st.skin; ctx.beginPath(); sDot(hx, 0, r - 0.75, -0.6, -0.7); ctx.fill(); // 빛 받는 얼굴
   ctx.fillStyle = st.skinD; ctx.beginPath(); lDot(hx + dir * (r - 0.35), 0, 0.95); ctx.fill(); // 코
   ctx.fillStyle = st.hair; ctx.beginPath();
-  var s = st.style;
-  if (s === 1) lDot(hx - dir * 0.9, 0, r * 0.84);                       // 짧게 깎은 머리
-  else if (s === 3) { lDot(hx - dir * 0.8, 0, r * 1.02); }               // 곱슬 (풍성)
+  var s = st.style, hc = hx - dir * 1.15, hr = r * 0.95;
+  if (s === 1) { hc = hx - dir * 0.9; hr = r * 0.84; lDot(hc, 0, hr); }  // 짧게 깎은 머리
+  else if (s === 3) { hc = hx - dir * 0.8; hr = r * 1.02; lDot(hc, 0, hr); } // 곱슬 (풍성)
   else {
-    lDot(hx - dir * 1.15, 0, r * 0.95);
-    if (s === 2) lDot(hx - dir * (r + 1.3), 0, 1.9);                    // 묶은 머리
+    lDot(hc, 0, hr);
+    if (s === 2) lDot(hx - dir * (r + 0.6), 0, 1.45);                   // 묶은 머리 (짧게: 등번호를 가리지 않게)
     if (s === 4) { lDot(hx - dir * 0.2, -r * 0.45, r * 0.5); lDot(hx - dir * 0.2, r * 0.45, r * 0.5); } // 앞머리
   }
   ctx.fill();
+  ctx.fillStyle = st.hairH; ctx.beginPath(); sDot(hc, 0, hr * 0.5, -0.9, -1); ctx.fill(); // 머리 윤기
 }
+// 로컬 점 (a, b) 에서 화면 방향으로 (ox, oy) 만큼 옮긴 원 (빛 방향은 선수가 돌아도 그대로)
+function sDot(a, b, r, ox, oy) { var x = a * PC - b * PS + ox, y = a * PS + b * PC + oy; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); }
 function pTorso() {
   ctx.beginPath();
   lM(4.6, 0); lB(4.8, 5.4, 4.3, 10.6, 0.6, 12.1); lB(-2.6, 13.3, -6.8, 12.4, -8.3, 9);
   lB(-9.9, 5.4, -9.9, -5.4, -8.3, -9); lB(-6.8, -12.4, -2.6, -13.3, 0.6, -12.1); lB(4.3, -10.6, 4.8, -5.4, 4.6, 0);
 }
-// 유니폼 무늬: 몸통 모양으로 잘라(clip) 트림 색으로 그립니다
+// 유니폼 무늬: 몸통 모양으로 잘라(clip) 트림 색으로 그립니다. 선은 가늘게 (몸통의 약 85% 이상은 셔츠 색 그대로: 팀 색이 먼저 보이게)
 function pPattern(st) {
   var q = st.pat;
   ctx.save(); ctx.clip(); ctx.globalAlpha = 0.8; ctx.strokeStyle = st.trimC; ctx.beginPath();
-  if (q === 1) { ctx.lineWidth = 1.9; lM(6, -6.4); lL(-11, -6.4); lM(6, 6.4); lL(-11, 6.4); } // 세로 줄무늬
-  else if (q === 2) { ctx.lineWidth = 3.4; lM(6, -13); lL(-11, 11); }                                   // 어깨띠
-  else if (q === 3) { ctx.lineWidth = 3; lM(1.2, -14); lL(1.2, 14); }                                   // 어깨 가로띠
-  else if (q === 4) { ctx.lineWidth = 2.3; lM(3.5, -14); lL(-3.5, 0); lL(3.5, 14); }                    // V 무늬
-  else if (q === 5) { ctx.lineWidth = 2; lM(0.4, -14); lL(0.4, 14); lM(-9.2, -14); lL(-9.2, 14); }      // 가로 줄무늬
-  else if (q === 6) { ctx.lineWidth = 1.1; for (var i = -3; i <= 3; i++) if (i) { lM(6, i * 3.4); lL(-11, i * 3.4); } } // 핀 스트라이프
+  if (q === 1) { ctx.lineWidth = 1.2; lM(6, -6.4); lL(-11, -6.4); lM(6, 6.4); lL(-11, 6.4); } // 세로 줄무늬
+  else if (q === 2) { ctx.lineWidth = 2; lM(6, -13); lL(-11, 11); }                                   // 어깨띠
+  else if (q === 3) { ctx.lineWidth = 2; lM(1.2, -14); lL(1.2, 14); }                                   // 어깨 가로띠
+  else if (q === 4) { ctx.lineWidth = 1.5; lM(3.5, -14); lL(-3.5, 0); lL(3.5, 14); }                    // V 무늬
+  else if (q === 5) { ctx.lineWidth = 1.4; lM(0.4, -14); lL(0.4, 14); lM(-9.2, -14); lL(-9.2, 14); }      // 가로 줄무늬
+  else if (q === 6) { ctx.lineWidth = 0.7; lM(6, -8.4); lL(-11, -8.4); lM(6, -3.6); lL(-11, -3.6); lM(6, 3.6); lL(-11, 3.6); lM(6, 8.4); lL(-11, 8.4); } // 핀 스트라이프 (가늘게)
   ctx.stroke(); ctx.restore();
 }
 // 기절 (별이 머리 위를 돕니다)
@@ -2909,9 +2910,9 @@ function pNumber(st, a, b) {
 function drawPlayer(p) {
   var st = pStyle(p), x = p.x, y = p.y;
   ctx.translate(x, y); ctx.scale(P_SCALE, P_SCALE);
-  if (p.slideT > 0 || p.diveT > 0 || (p.stun > 0.2 && (p.slideCd > 0.9 || p.diveCd > 0.4))) drawLying(p, st);
+  if (p.slideT > 0 || p.diveT > 0 || (p.stun > 0.2 && !p.stunHit && (p.slideCd > 0.9 || p.diveCd > 0.4))) drawLying(p, st);
   else drawUpright(p, st);
-  if (p.stun > 0.05) pStars(G.time + p.idx);
+  if (p.stun > 0.05 && p.stunHit) pStars(G.time + p.idx); // 별은 태클당했을 때만 (내 슬라이딩·다이빙 뒤 일어나는 동안은 아님)
   ctx.scale(1 / P_SCALE, 1 / P_SCALE); ctx.translate(-x, -y);
 }
 function drawUpright(p, st) {
@@ -2921,6 +2922,7 @@ function drawUpright(p, st) {
   var sn = Math.sin(p.anim), stride = run > 0 ? 2 + 8.5 * run : 0, arm = 1 + 5.5 * run;
   var hx = 2.3 + run * 1.2, roll = -sn * 0.09 * run, sx = -1.8, sw = 13.8 + (own ? 0.8 : 0), over = false;
   var kt = p.kickCd > 0 ? 0.3 - p.kickCd : 9, t = G.time + p.idx * 0.7; // 실제로 찬 선수만 (kickBall 의 0.3초 타이머)
+  var lean = 0;
   // 기본: 달리기(팔·다리 반대로 흔들기) / 서 있기
   if (run > 0) {
     o.lfx = -1.4 - sn * stride; o.lfy = -4 + run * 0.5; o.rfx = -1.4 + sn * stride; o.rfy = 4 - run * 0.5;
@@ -2949,12 +2951,22 @@ function drawUpright(p, st) {
     if (ft > 0) { o.rfx = bx; o.rfy = 4.2; o.lfx = 2.6; o.lfy = -5; } else { o.lfx = bx; o.lfy = -4.2; o.rfx = 2.6; o.rfy = 5; }
     o.lhx = ft > 0 ? 2 : -3.5; o.lhy = -16; o.rhx = ft > 0 ? -3.5 : 2; o.rhy = 16;
     roll = -ft * 0.16 * c;
-  } else if (p.stun > 0) { // 휘청
+  } else if (own && ball.z < 6) { // 드리블: 공이 발에 붙어 보이게 (공 위치·물리는 그대로, 그림만 공 쪽으로)
+    var bdx = ball.x - p.x, bdy = ball.y - p.y, al = (bdx * fx + bdy * fy) / P_SCALE, la = (bdy * fx - bdx * fy) / P_SCALE;
+    lean = al > 14 ? Math.min(3, al - 14) : 0; // 몸을 공 쪽으로 살짝 기울입니다
+    // 주로 쓰는 발 끝이 공 뒤쪽에 닿도록 (걸음마다 톡톡)
+    // (발끝 = 발 + 2.2, 외곽선 끝 = +2.8 더, 공 뒤쪽 면 = 공 중심 - DRIB_B)
+    var ry = la + ft * 2.6, rx = al - lean - 5 - DRIB_B + 0.6 + 0.8 * Math.sin(p.anim * 2);
+    rx = Math.min(12.5, rx); ry = ry < -7 ? -7 : (ry > 7 ? 7 : ry);
+    if (ft > 0) { o.rfx = rx; o.rfy = ry; } else { o.lfx = rx; o.lfy = ry; }
+    hx += run > 0 ? 0.6 : 0;
+  } else if (p.stun > 0 && p.stunHit) { // 휘청 (태클당했을 때)
     roll = Math.sin(G.time * 19) * 0.28; o.lhx = o.rhx = 0.5; o.lhy = -17; o.rhy = 17;
   } else if (gk && run < 0.5) { // 골키퍼 준비 자세
     o.lhx = o.rhx = 3.6; o.lhy = -16.5; o.rhy = 16.5; o.lfy = -6.2; o.rfy = 6.2;
   }
   PC = fx; PS = fy;
+  if (lean) ctx.translate(lean * fx, lean * fy);
   // 그림자 (빛: 왼쪽 위)
   ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath();
   ctx.ellipse(-1.5 * fx + 3.2, -1.5 * fy + 4.4, 9.5, 14, Math.atan2(fy, fx), 0, 6.2832); ctx.fill();
@@ -2963,10 +2975,11 @@ function drawUpright(p, st) {
   var cr = 1 - roll * roll * 0.5; PC = fx * cr - fy * roll; PS = fy * cr + fx * roll;
   if (!over) pArms(st, sx, 10.2);
   // 몸통 (어깨 · 등)
-  pTorso();
+  pTorso(); ctx.fillStyle = st.bodyD; ctx.fill(); // 그늘 (오른쪽 아래 가장자리)
+  ctx.translate(-0.7, -0.8); ctx.scale(0.93, 0.93); pTorso(); ctx.scale(1 / 0.93, 1 / 0.93); ctx.translate(0.7, 0.8);
   ctx.fillStyle = st.body; ctx.fill();
-  if (st.pat) { pPattern(st); pTorso(); }
-  ctx.lineWidth = 1.5; ctx.strokeStyle = P_OUT; ctx.stroke();
+  if (st.pat) pPattern(st);
+  pTorso(); ctx.lineWidth = 1.5; ctx.strokeStyle = P_OUT; ctx.stroke();
   // 소매 끝 · 어깨선 · 옷깃 (트림 색)
   ctx.strokeStyle = st.trimC; ctx.lineWidth = 1.7; ctx.beginPath();
   lM(2.6, -10.6); lB(0.6, -11.9, -3.2, -12.2, -5.6, -10.9);
@@ -2975,9 +2988,17 @@ function drawUpright(p, st) {
   ctx.lineWidth = 2.1; ctx.beginPath();
   var cx = hx * PC, cy = hx * PS, ca = Math.atan2(PS, PC);
   ctx.arc(cx, cy, 5.5, ca + 1.25, ca + 5.03); ctx.stroke();
-  pNumber(st, -5.9, 0);
   pHead(st, hx, 4.2, 1);
+  pNumber(st, -5.9, 0); // 머리 다음에: 머리카락이 번호를 가리지 않게
   if (over) pArms(st, sx, 10.2);
+  if (lean) ctx.translate(-lean * fx, -lean * fy);
+}
+// 누운 몸통 (타원): 그늘 → 빛 받는 면 → 외곽선
+function pBlob(a, rx, ry, ang, st) {
+  var x = a * PC, y = a * PS;
+  ctx.fillStyle = st.bodyD; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, ang, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = st.body; ctx.beginPath(); ctx.ellipse(x - 0.7, y - 0.8, rx - 1, ry - 1, ang, 0, 6.2832); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x, y, rx, ry, ang, 0, 6.2832); ctx.lineWidth = 1.5; ctx.strokeStyle = P_OUT; ctx.stroke();
 }
 // 넘어진 자세: 슬라이딩 태클(발부터) · 골키퍼 다이빙(손부터) · 그 뒤 쓰러져 있는 동안
 function drawLying(p, st) {
@@ -2998,8 +3019,7 @@ function drawLying(p, st) {
     o.lhx = 5 + 11 * e; o.lhy = -4.2; o.rhx = 5 + 11 * e; o.rhy = 4.2;
     pLegs(st, -7.6, 3.4, -1);
     pArms(st, 3, 6.8);
-    ctx.beginPath(); ctx.ellipse(-1 * PC, -1 * PS, 8.2, 7.4, ang, 0, 6.2832);
-    ctx.fillStyle = st.body; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = P_OUT; ctx.stroke();
+    pBlob(-1, 8.2, 7.4, ang, st);
     ctx.strokeStyle = st.trimC; ctx.lineWidth = 1.7; ctx.beginPath(); lM(4.2, -5.8); lL(5.8, 0); lL(4.2, 5.8); ctx.stroke();
     pNumber(st, -1.5, 0);
     pHead(st, 9.3, 4.2, -1);
@@ -3014,8 +3034,7 @@ function drawLying(p, st) {
     o.rhx = -5.2; o.rhy = 14.5; o.lhx = -14.5; o.lhy = -13;
     pLegs(st, -0.5, 3.4, 1);
     pArms(st, -9.4, 7.2);
-    ctx.beginPath(); ctx.ellipse(-5.8 * PC, -5.8 * PS, 7.4, 8.8, ang, 0, 6.2832);
-    ctx.fillStyle = st.body; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = P_OUT; ctx.stroke();
+    pBlob(-5.8, 7.4, 8.8, ang, st);
     pNumber(st, -5.4, 0);
     pHead(st, -14.8, 4.2, 1);
   }
